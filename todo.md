@@ -37,3 +37,9 @@
 - [x] Translate the public storefront and primary product-detail content into Arabic.
 - [x] Verify Arabic selection, browser persistence, and mobile/desktop right-to-left layout.
 - [x] Verify the Arabic storefront and product-detail pages at desktop width for readable right-to-left alignment.
+- [x] Define the French translation coverage and persistent selector behavior.
+- [x] Extend locale persistence and the selector menu to a working French option.
+- [x] Translate the public storefront and primary product-detail content into French.
+- [x] Verify French selection, browser persistence, and mobile/desktop layout.
+- [x] Translate the remaining French product-detail footer, secondary navigation, and support copy.
+- [x] Select French from the language menu and verify its saved state persists across navigation and reload.

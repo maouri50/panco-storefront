@@ -39,9 +39,17 @@ const arabicProducts: Record<string, ProductCopy> = {
   },
 };
 
+const frenchProducts: Record<string, ProductCopy> = {
+  "atlas-card-wallet": { name: "Porte-cartes Atlas", category: "Petite maroquinerie", tag: "Nouveau", description: "Un portefeuille compact pour les cartes, les billets et les petits rituels du quotidien. Léger en main, souplement structuré, il se patine avec l’usage.", highlights: ["Quatre fentes pour cartes et une poche à billets", "Cuir pleine fleur tanné végétal", "Tranches polies à la main et couture sellier", "Format adapté à la poche avant"], colors: { Oxblood: "Bordeaux", "Night brown": "Brun nuit" } },
+  "morrow-tote": { name: "Cabas Morrow", category: "Porté quotidien", description: "Un cabas généreux qui équilibre proportions souples et utilité simple. Pensé pour un carnet, une couche et tout ce qui fait fonctionner une journée.", highlights: ["Fermeture aimantée", "Poche intérieure suspendue", "Anses confortables", "Pièces en laiton massif"], colors: { Saddle: "Cognac", Umber: "Terre d’ombre" } },
+  "rook-field-bag": { name: "Sac de terrain Rook", category: "Sac bandoulière", tag: "Sélection studio", description: "Un sac de terrain pour garder l’essentiel à portée de main. Sa silhouette compacte porte l’architecture d’une journée sans attirer l’attention.", highlights: ["Bandoulière réglable", "Poche utilitaire avant", "Intérieur doublé souple", "Fabriqué en petite série"], colors: { Cedar: "Cèdre", Chestnut: "Châtaigne" } },
+  "long-mile-duffle": { name: "Sac de voyage Long Mile", category: "Week-end", description: "Un sac souple pour une belle nuit ailleurs ou quelques jours hors de l’ordinaire. Porté équilibré, fermetures solides et forme qui s’embellit à chaque voyage.", highlights: ["Large ouverture zippée", "Bandoulière amovible", "Base en cuir renforcée", "Dimensions cabine"], colors: { Oxhide: "Cuir brun", "Dark umber": "Brun foncé" } },
+};
+
 export function localizeProduct(product: Product, locale: Locale): Product {
-  if (locale !== "ar" || !arabicProducts[product.slug]) return product;
-  const copy = arabicProducts[product.slug];
+  const collection = locale === "ar" ? arabicProducts : locale === "fr" ? frenchProducts : undefined;
+  if (!collection?.[product.slug]) return product;
+  const copy = collection[product.slug];
   return {
     ...product,
     name: copy.name,
@@ -90,6 +98,24 @@ export const homeCopy = {
     notes: "رسائل متفرقة\nمن الاستوديو.",
     language: "اللغة",
   },
+  fr: {
+    locale: "Français",
+    localeDetail: "Europe & Afrique",
+    promo: ["Livraison offerte dès 150 $", "Paiement à la livraison disponible", "Objets en petites séries, expédiés chaque semaine"],
+    nav: { shop: "Boutique", studio: "Atelier", journal: "Journal" },
+    hero: [
+      { eyebrow: "L’édition d’été", title: "Emportez la journée\navec vous.", note: "Des compagnons façonnés lentement pour les trajets quotidiens, les trains de nuit et les longs retours.", cta: "Voir la sélection" },
+      { eyebrow: "Pour l’entre-deux", title: "De la place\npour l’essentiel.", note: "Une étude de proportions souples, de poches utiles et de cuir qui dure.", cta: "Explorer les sacs" },
+      { eyebrow: "Fait à la main", title: "La preuve\ndu soin.", note: "Chaque tranche est polie, chaque couture pensée, rien n’est précipité.", cta: "Rencontrer les artisans" },
+    ],
+    newArrivals: "Nouveautés",
+    everyday: "Objets pour\nle quotidien.",
+    collections: "Voir toutes les collections",
+    quickAdd: "Ajout rapide",
+    stayConnected: "Rester en contact",
+    notes: "Quelques nouvelles\nde l’atelier.",
+    language: "Langue",
+  },
 } as const;
 
 export const productCopy = {
@@ -98,5 +124,8 @@ export const productCopy = {
   },
   ar: {
     back: "العودة إلى الاستوديو", available: "الدفع عند الاستلام متاح", ledger: "نورث أتيلييه / سجل المنتجات", object: "قطعة من نورث أتيلييه", details: "التفاصيل", taxes: "تُحسب الضرائب والتوصيل عند التأكيد.", dispatch: "متاح للشحن من الاستوديو", run: "دفعة صغيرة من الورشة", color: "اللون", add: "أضف إلى الحقيبة", order: "اطلب بالدفع عند الاستلام", closeOrder: "إغلاق تفاصيل الطلب", easyOrder: "طلب سهل / الدفع عند الاستلام", deliverySimple: "توصيل\nبكل بساطة.", deliveryNote: "يتم الدفع فقط عند وصول طلبك.", fullName: "الاسم الكامل", phone: "رقم الهاتف", address: "عنوان التوصيل", city: "المدينة", note: "ملاحظة الطلب", confirm: "تأكيد طلب الدفع عند الاستلام", cashTitle: "الدفع عند الاستلام", cashBody: "نؤكد تفاصيل التوصيل قبل الشحن، ثم يستلم المندوب قيمة الطلب عند بابك.", customerNotes: "ملاحظات العملاء", noNotes: "لا توجد\nملاحظات بعد.", noNotesBody: "لا توجد ملاحظات منشورة لهذه القطعة حتى الآن. ستظهر الملاحظات الحقيقية هنا عند توفرها.", related: "قد تعجبك\nهذه القطع أيضاً.", viewEdit: "شاهد تشكيلة الاستوديو", ask: "تواصل مع الاستوديو", quantity: "الكمية", added: "أُضيف إلى حقيبتك", continueCod: "تابع إلى الدفع عند الاستلام", keepBrowsing: "تابع التصفح",
+  },
+  fr: {
+    back: "Retour à l’atelier", available: "Paiement à la livraison disponible", ledger: "North Atelier / Registre produit", object: "Objet North Atelier", details: "Détails", taxes: "Taxes et livraison calculées à la confirmation.", dispatch: "Disponible pour expédition atelier", run: "Petite série d’atelier", color: "Couleur", add: "Ajouter au sac", order: "Commander avec paiement à la livraison", closeOrder: "Fermer les détails", easyOrder: "Commande simple / Paiement à la livraison", deliverySimple: "Livraison,\ntout simplement.", deliveryNote: "Le paiement est collecté seulement à la livraison.", fullName: "Nom complet", phone: "Téléphone", address: "Adresse de livraison", city: "Ville", note: "Note de commande", confirm: "Confirmer la commande à la livraison", cashTitle: "Paiement à la livraison", cashBody: "Nous confirmons les détails avant l’expédition, puis le livreur collecte le montant à votre porte.", customerNotes: "Notes de clients", noNotes: "Pas encore\nde notes.", noNotesBody: "Cet objet n’a pas encore de notes publiées. Les retours authentiques apparaîtront ici lorsqu’ils seront disponibles.", related: "Vous aimerez\npeut-être aussi.", viewEdit: "Voir la sélection atelier", ask: "Écrire à l’atelier", quantity: "Quantité", added: "Ajouté à votre sac", continueCod: "Continuer avec paiement à la livraison", keepBrowsing: "Continuer à parcourir",
   },
 } as const;

@@ -5,8 +5,8 @@ import { catalogProducts } from "@/lib/catalog";
 
 describe("Arabic locale helpers", () => {
   it("defaults unsupported stored locales to English", () => {
-    expect(normalizeLocale("fr")).toBe("en");
     expect(normalizeLocale("ar")).toBe("ar");
+    expect(normalizeLocale("fr")).toBe("fr");
   });
 
   it("keeps the catalog structure while supplying Arabic product labels", () => {
@@ -14,5 +14,6 @@ describe("Arabic locale helpers", () => {
     expect(localized.slug).toBe("atlas-card-wallet");
     expect(localized.name).toBe("محفظة أطلس للبطاقات");
     expect(localized.colors[0]?.name).toBe("خمري داكن");
+    expect(localizeProduct(catalogProducts[0], "fr").name).toBe("Porte-cartes Atlas");
   });
 });

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-export type Locale = "en" | "ar";
+export type Locale = "en" | "fr" | "ar";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -12,7 +12,7 @@ const STORAGE_KEY = "north-atelier-locale";
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined);
 
 export function normalizeLocale(value: string | null): Locale {
-  return value === "ar" ? "ar" : "en";
+  return value === "ar" || value === "fr" ? value : "en";
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
@@ -23,7 +23,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const direction: "ltr" | "rtl" = locale === "ar" ? "rtl" : "ltr";
 
   useEffect(() => {
-    document.documentElement.lang = locale === "ar" ? "ar" : "en";
+    document.documentElement.lang = locale;
     document.documentElement.dir = direction;
     document.documentElement.dataset.locale = locale;
     localStorage.setItem(STORAGE_KEY, locale);
