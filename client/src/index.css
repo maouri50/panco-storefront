@@ -1,5 +1,5 @@
 /**
- * North Atelier style note — Neutral Ledger:
+ * Panco style note — Neutral Ledger:
  * EDITABLE COLOR SYSTEM sits below. Change the six CSS variables to retheme the full storefront.
  * Components use sharp rules, paper panels, premium campaign imagery, and restrained retail micro-type.
  */
@@ -72,12 +72,16 @@ a { color: inherit; text-decoration: none; }
 .house-mark__type { display: inline-flex; align-items: center; gap: 7px; font-family: "Playfair Display", Georgia, serif; font-size: 25px; line-height: 1; letter-spacing: -.045em; white-space: nowrap; }
 .house-mark__type b { letter-spacing: -.15em; font-weight: 500; }
 .house-mark__type i { width: 1px; height: 22px; background: currentColor; opacity: .7; }
+.brand-monogram { width: 34px; height: 34px; display: inline-grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-family: "DM Mono", ui-monospace, monospace; font-size: 9px; font-weight: 700; letter-spacing: -.1em; line-height: 1; }
+.brand-monogram--light { color: var(--shell); }
+.brand-monogram--footer { width: 25px; height: 25px; font-size: 7px; }
 
 .hero-carousel { position: relative; height: min(820px, calc(100vh - 34px)); min-height: 650px; overflow: hidden; color: #fff; background: var(--night); }
 .hero-carousel__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; animation: hero-fade .7s var(--ease-out); }
 .hero-carousel__wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12, 12, 12, .66), rgba(12, 12, 12, .24) 55%, rgba(12, 12, 12, .08)), linear-gradient(0deg, rgba(12, 12, 12, .40), transparent 40%); }
 .hero-house-stamp { position: absolute; z-index: 3; top: 152px; left: clamp(28px, 5vw, 76px); display: grid; grid-template-columns: 38px auto; align-items: center; gap: 10px; padding: 0 0 9px; border-bottom: 1px solid rgba(255,255,255,.52); color: var(--shell); }
 .hero-house-stamp img { width: 34px; height: 34px; filter: brightness(0) invert(1); }
+.hero-house-stamp .brand-monogram { width: 34px; height: 34px; }
 .hero-house-stamp div { display: grid; grid-template-columns: auto auto; align-items: baseline; gap: 5px; }
 .hero-house-stamp b { font-family: "Playfair Display", Georgia, serif; font-size: 28px; font-weight: 500; letter-spacing: -.17em; }
 .hero-house-stamp span { font-family: "Playfair Display", Georgia, serif; font-size: 17px; letter-spacing: -.04em; }
@@ -563,7 +567,7 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .gallery-grid__plate--3 img { object-position: 48% 86%; transform: scale(1.22); }
 .gallery-grid__plate:hover img { transform: scale(1.4); }
 .product-detail__purchase { position: sticky; top: 0; align-self: start; min-height: 100vh; padding: 55px clamp(30px, 5vw, 82px) 54px; border-left: 1px solid var(--line); }
-.product-detail__purchase::before { content: ""; position: absolute; top: 28px; right: 30px; width: 42px; height: 42px; background: url("/manus-storage/north-atelier-mark_c591b808.png") center / contain no-repeat; filter: grayscale(1) contrast(1.22); opacity: .13; pointer-events: none; }
+.product-detail__purchase::before { content: "IP"; position: absolute; top: 28px; right: 30px; width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-family: "DM Mono", ui-monospace, monospace; font-size: 9px; font-weight: 700; letter-spacing: -.1em; opacity: .13; pointer-events: none; }
 .breadcrumb { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; color: var(--muted); text-transform: uppercase; font-size: 7px; letter-spacing: .11em; }
 .breadcrumb a:hover { color: var(--ink); }
 .breadcrumb b { color: var(--ink); font-weight: 400; }

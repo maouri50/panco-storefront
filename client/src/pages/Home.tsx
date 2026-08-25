@@ -1,5 +1,5 @@
 /**
- * North Atelier style note — Coastal Ledger:
+ * Panco style note — Coastal Ledger:
  * a reference-inspired retail rhythm built from shell paper, inset blue, ember accents,
  * centered house mark, oversized campaign imagery, and crisp mono retail annotations.
  */
@@ -27,6 +27,7 @@ import { type Product } from "@/lib/catalog";
 import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 import { useLocale } from "@/contexts/LocaleContext";
 import { homeCopy, localizeProduct } from "@/lib/localization";
+import { trpc } from "@/lib/trpc";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
@@ -116,6 +117,9 @@ export default function Home() {
   const [localeOpen, setLocaleOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [scrolled, setScrolled] = useState(false);
+  const submitCashOnDelivery = trpc.orders.submitCashOnDelivery.useMutation({
+    onSuccess: () => setOrderSubmitted(true),
+  });
 
   useEffect(() => {
     const slideTimer = window.setInterval(() => setActiveSlide((current) => (current + 1) % heroSlides.length), 6200);
@@ -149,7 +153,19 @@ export default function Home() {
 
   const submitCheckout = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setOrderSubmitted(true);
+    if (!cartItem) return;
+    const form = new FormData(event.currentTarget);
+    submitCashOnDelivery.mutate({
+      productName: cartItem.name,
+      productPrice: cartItem.price,
+      color: cartItem.colors[0]?.name ?? "Standard",
+      quantity: Math.min(Math.max(cartCount, 1), 9),
+      customerName: String(form.get("customerName") ?? ""),
+      phone: String(form.get("phone") ?? ""),
+      address: String(form.get("address") ?? ""),
+      city: String(form.get("city") ?? ""),
+      note: String(form.get("note") ?? "") || undefined,
+    });
   };
 
   const slide = { ...heroSlides[activeSlide], ...copy.hero[activeSlide] };
@@ -168,7 +184,7 @@ export default function Home() {
           </div>
         )}
         <span className="utility-message" key={promoIndex}>{copy.promo[promoIndex]}</span>
-        <span className="utility-side">North Atelier / Since 2024</span>
+        <span className="utility-side">Panco / Since 2024</span>
       </div>
 
       <header className={`top-nav ${scrolled ? "top-nav--solid" : ""}`}>
@@ -180,9 +196,9 @@ export default function Home() {
             <a href="#journal">{copy.nav.journal}</a>
           </nav>
         </div>
-        <a className="house-mark" href="#top" aria-label="North Atelier home">
-          <img src="/manus-storage/north-atelier-mark_c591b808.png" alt="" />
-          <span className="house-mark__type"><b>N/A</b><i /> North Atelier</span>
+        <a className="house-mark" href="#top" aria-label="Panco home">
+          <span className="brand-monogram" aria-hidden="true">P</span>
+          <span className="house-mark__type">Panco</span>
         </a>
         <div className="top-nav__side top-nav__side--right">
           <button type="button" className="icon-button" aria-label="Search" onClick={() => setSearchOpen(true)}><Search size={20} /></button>
@@ -194,10 +210,10 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="hero-carousel" aria-label="Featured North Atelier campaign">
-          <img src={slide.image} alt="North Atelier collection" className="hero-carousel__image" key={slide.image} />
+        <section className="hero-carousel" aria-label="Featured Panco campaign">
+          <img src={slide.image} alt="Panco collection" className="hero-carousel__image" key={slide.image} />
           <div className="hero-carousel__wash" />
-          <div className="hero-house-stamp" aria-hidden="true"><img src="/manus-storage/north-atelier-mark_c591b808.png" alt="" /><div><b>N/A</b><span>North Atelier</span><small>Objects / studio ledger</small></div></div>
+          <div className="hero-house-stamp" aria-hidden="true"><span className="brand-monogram brand-monogram--light">P</span><div><span>Panco</span><small>Objects / studio ledger</small></div></div>
           <div className={`hero-content ${slide.align}`}>
             <p className="kicker kicker--light">{slide.eyebrow}</p>
             <h1>{slide.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h1>
@@ -261,12 +277,12 @@ export default function Home() {
         </section>
 
         <section id="story" className="craft-section">
-          <div className="craft-section__image"><img src="/manus-storage/north-atelier-workshop_151c4843.jpg" alt={isArabic ? "حرفي يخيط قطعة جلدية باليد" : isFrench ? "Artisan cousant une pièce en cuir à la main" : "Artisan stitching a leather piece by hand"} /><span>{isArabic ? "نورث أتيلييه / دراسة مادة رقم 05" : isFrench ? "North Atelier / Étude matière no 05" : "North Atelier / Material study no. 05"}</span></div>
+          <div className="craft-section__image"><img src="/manus-storage/north-atelier-workshop_151c4843.jpg" alt={isArabic ? "حرفي يخيط قطعة جلدية باليد" : isFrench ? "Artisan cousant une pièce en cuir à la main" : "Artisan stitching a leather piece by hand"} /><span>{isArabic ? "بانكو / دراسة مادة رقم 05" : isFrench ? "Panco / Étude matière no 05" : "Panco / Material study no. 05"}</span></div>
           <div className="craft-section__copy">
             <p className="kicker">{isArabic ? "الفن قبل التجارة" : isFrench ? "L’art avant le commerce" : "Art before commerce"}</p>
             <h2>{isArabic ? <>صُنعت ومعها<br /><em>ذاكرة.</em></> : isFrench ? <>Faite avec<br /><em>une mémoire.</em></> : <>Built with<br /><em>a memory.</em></>}</h2>
             <p className="lead">{isArabic ? "القطعة الجيدة لا تصل مكتملة الحكاية. إنها تكتسب شخصيتها ببطء عبر الأيدي والطقس والمسافة والاستعمال." : isFrench ? "Une belle pièce n’arrive jamais achevée. Elle gagne lentement son caractère, par les mains, le temps, la distance et l’usage." : "A good piece does not arrive finished. It gathers its character slowly — through hands, weather, distance, and use."}</p>
-            <p>{isArabic ? "يصنع استوديو نورث أتيلييه قطعاً جلدية بدفعات هادئة، بمواد كاملة الحبيبات وبناء قابل للإصلاح ومساحة لآثار حياة عاشت جيداً." : isFrench ? "Notre atelier fabrique des objets en cuir en petites séries patientes, avec des matières pleine fleur, une construction réparable et la place pour les traces d’une vie bien portée." : "Our studio makes leather objects in patient runs, with full-grain materials, repairable construction, and room for the evidence of a life well carried."}</p>
+            <p>{isArabic ? "يصنع استوديو بانكو قطعاً جلدية بدفعات هادئة، بمواد كاملة الحبيبات وبناء قابل للإصلاح ومساحة لآثار حياة عاشت جيداً." : isFrench ? "Notre atelier Panco fabrique des objets en cuir en petites séries patientes, avec des matières pleine fleur, une construction réparable et la place pour les traces d’une vie bien portée." : "The Panco studio makes leather objects in patient runs, with full-grain materials, repairable construction, and room for the evidence of a life well carried."}</p>
             <a href="#journal" className="outline-link">{isArabic ? "داخل الاستوديو" : isFrench ? "Dans l’atelier" : "Inside the studio"} <ArrowRight size={15} /></a>
             <div className="craft-figures"><div><b>01</b><span>{isArabic ? <>جلد كامل<br />الحبيبات</> : isFrench ? <>Cuir pleine<br />fleur</> : <>Full-grain<br />leather</>}</span></div><div><b>02</b><span>{isArabic ? <>حواف مشطبة<br />يدوياً</> : isFrench ? <>Tranches finies<br />à la main</> : <>Hand-finished<br />edges</>}</span></div><div><b>03</b><span>{isArabic ? <>بناء مخصص<br />للإصلاح</> : isFrench ? <>Construction<br />réparable</> : <>Repair-led<br />construction</>}</span></div></div>
           </div>
@@ -288,7 +304,7 @@ export default function Home() {
         </section>
 
         <section className="faq-section page-section">
-          <div className="faq-intro"><p className="kicker">{isArabic ? "معرفة نورث أتيلييه" : isFrench ? "Le savoir North Atelier" : "North Atelier knowledge"}</p><h2>{isArabic ? <>أسئلة<br /><em>مدروسة.</em></> : isFrench ? <>Des questions<br /><em>réfléchies.</em></> : <>Questions,<br /><em>considered.</em></>}</h2><p>{isArabic ? <>هل تحتاج إلى شيء أكثر تحديداً؟ <a href="#top">اكتب إلى الاستوديو.</a></> : isFrench ? <>Besoin de quelque chose de plus précis ? <a href="#top">Écrivez à l’atelier.</a></> : <>Need something more specific? <a href="#top">Write to the studio.</a></>}</p></div>
+          <div className="faq-intro"><p className="kicker">{isArabic ? "معرفة بانكو" : isFrench ? "Le savoir Panco" : "Panco knowledge"}</p><h2>{isArabic ? <>أسئلة<br /><em>مدروسة.</em></> : isFrench ? <>Des questions<br /><em>réfléchies.</em></> : <>Questions,<br /><em>considered.</em></>}</h2><p>{isArabic ? <>هل تحتاج إلى شيء أكثر تحديداً؟ <a href="#top">اكتب إلى الاستوديو.</a></> : isFrench ? <>Besoin de quelque chose de plus précis ? <a href="#top">Écrivez à l’atelier.</a></> : <>Need something more specific? <a href="#top">Write to the studio.</a></>}</p></div>
           <div className="faq-list">
             {localizedFaqItems.map((item, index) => (
               <div className={`faq-item ${openFaq === index ? "faq-item--open" : ""}`} key={item.question}>
@@ -301,14 +317,14 @@ export default function Home() {
       </main>
 
       <footer className="footer">
-        <div className="footer__intro"><a className="footer-brand" href="#top"><img src="/manus-storage/north-atelier-mark_c591b808.png" alt="" /><span>North Atelier</span></a><p>{isArabic ? "قطع للطريق الطويل. مشطبة يدوياً بعناية ومصممة للاستعمال." : isFrench ? "Des objets pour le long chemin. Finis à la main avec retenue, dessinés pour l’usage." : "Objects for the long way home. Hand-finished with restraint, designed for use."}</p></div>
+        <div className="footer__intro"><a className="footer-brand" href="#top"><span className="brand-monogram brand-monogram--footer" aria-hidden="true">P</span><span>Panco</span></a><p>{isArabic ? "قطع للطريق الطويل. مشطبة يدوياً بعناية ومصممة للاستعمال." : isFrench ? "Des objets pour le long chemin. Finis à la main avec retenue, dessinés pour l’usage." : "Objects for the long way home. Hand-finished with restraint, designed for use."}</p></div>
         <div className="footer__links"><div><p>{isArabic ? "استكشاف" : isFrench ? "Explorer" : "Exploration"}</p><a href="#shop">{copy.nav.shop}</a><a href="#story">{copy.nav.studio}</a><a href="#journal">{copy.nav.journal}</a><a href="#top">{isArabic ? "العناية والإصلاح" : isFrench ? "Soin et réparation" : "Care & repair"}</a></div><div><p>{isArabic ? "عملي" : isFrench ? "Pratique" : "Practical"}</p><a href="#top">{isArabic ? "التوصيل" : isFrench ? "Livraison" : "Delivery"}</a><a href="#top">{isArabic ? "الدفع عند الاستلام" : isFrench ? "Paiement à la livraison" : "Cash on Delivery"}</a><a href="#top">{isArabic ? "الإرجاع" : isFrench ? "Retours" : "Returns"}</a><a href="#top">{isArabic ? "تواصل معنا" : isFrench ? "Contact" : "Contact"}</a></div><div><p>{isArabic ? "تابعنا" : isFrench ? "Suivre" : "Follow"}</p><a href="#top">Instagram</a><a href="#top">Pinterest</a><a href="#top">{isArabic ? "النشرة البريدية" : isFrench ? "Newsletter" : "Newsletter"}</a></div></div>
-        <div className="footer__base"><span>© 2026 North Atelier</span><span>{isArabic ? "صُنع ببطء. استُخدم جيداً." : isFrench ? "Fait lentement. Bien porté." : "Made slowly. Used well."}</span><span>{isArabic ? "الخصوصية / الشروط" : isFrench ? "Confidentialité / Conditions" : "Privacy / Terms"}</span></div>
+        <div className="footer__base"><span>© 2026 Panco</span><span>{isArabic ? "صُنع ببطء. استُخدم جيداً." : isFrench ? "Fait lentement. Bien porté." : "Made slowly. Used well."}</span><span>{isArabic ? "الخصوصية / الشروط" : isFrench ? "Confidentialité / Conditions" : "Privacy / Terms"}</span></div>
       </footer>
 
-      {menuOpen && <div className="mobile-menu" role="dialog" aria-modal="true"><div className="mobile-menu__head"><a className="house-mark house-mark--dark" href="#top"><img src="/manus-storage/north-atelier-mark_c591b808.png" alt="" /><span className="house-mark__type"><b>N/A</b><i /> North Atelier</span></a><button className="icon-button" type="button" onClick={() => setMenuOpen(false)} aria-label={isArabic ? "إغلاق القائمة" : "Close navigation"}><X size={20} /></button></div><nav><a href="#shop" onClick={() => setMenuOpen(false)}><span>01</span> {copy.nav.shop} <ArrowRight size={18} /></a><a href="#collections" onClick={() => setMenuOpen(false)}><span>02</span> {isArabic ? "التشكيلات" : "Collections"} <ArrowRight size={18} /></a><a href="#story" onClick={() => setMenuOpen(false)}><span>03</span> {copy.nav.studio} <ArrowRight size={18} /></a><a href="#journal" onClick={() => setMenuOpen(false)}><span>04</span> {copy.nav.journal} <ArrowRight size={18} /></a></nav><button className="mobile-menu__search" type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><Search size={17} /> {isArabic ? "ابحث في نورث أتيلييه" : "Search North Atelier"}</button></div>}
+      {menuOpen && <div className="mobile-menu" role="dialog" aria-modal="true"><div className="mobile-menu__head"><a className="house-mark house-mark--dark" href="#top"><span className="brand-monogram" aria-hidden="true">P</span><span className="house-mark__type">Panco</span></a><button className="icon-button" type="button" onClick={() => setMenuOpen(false)} aria-label={isArabic ? "إغلاق القائمة" : "Close navigation"}><X size={20} /></button></div><nav><a href="#shop" onClick={() => setMenuOpen(false)}><span>01</span> {copy.nav.shop} <ArrowRight size={18} /></a><a href="#collections" onClick={() => setMenuOpen(false)}><span>02</span> {isArabic ? "التشكيلات" : "Collections"} <ArrowRight size={18} /></a><a href="#story" onClick={() => setMenuOpen(false)}><span>03</span> {copy.nav.studio} <ArrowRight size={18} /></a><a href="#journal" onClick={() => setMenuOpen(false)}><span>04</span> {copy.nav.journal} <ArrowRight size={18} /></a></nav><button className="mobile-menu__search" type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><Search size={17} /> {isArabic ? "ابحث في بانكو" : isFrench ? "Rechercher Panco" : "Search Panco"}</button></div>}
 
-      {searchOpen && <div className="search-overlay" role="dialog" aria-modal="true"><button type="button" className="search-overlay__close" onClick={() => setSearchOpen(false)} aria-label={isArabic ? "إغلاق البحث" : "Close search"}><X size={22} /></button><div><p className="kicker">{isArabic ? "ابحث في الاستوديو" : "Search the atelier"}</p><input autoFocus placeholder={isArabic ? "جرّب «محفظة» أو «سفر»" : "Try ‘card wallet’ or ‘travel’"} /><div className="search-suggestions"><span>{isArabic ? "مقترحات" : "Suggested"}</span><button onClick={() => setSearchOpen(false)}>{isArabic ? "حمل يومي" : "Daily carry"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "سفر" : "Travel"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "عناية" : "Care"}</button></div></div></div>}
+      {searchOpen && <div className="search-overlay" role="dialog" aria-modal="true"><button type="button" className="search-overlay__close" onClick={() => setSearchOpen(false)} aria-label={isArabic ? "إغلاق البحث" : "Close search"}><X size={22} /></button><div><p className="kicker">{isArabic ? "ابحث في بانكو" : isFrench ? "Rechercher Panco" : "Search Panco"}</p><input autoFocus placeholder={isArabic ? "جرّب «محفظة» أو «سفر»" : "Try ‘card wallet’ or ‘travel’"} /><div className="search-suggestions"><span>{isArabic ? "مقترحات" : "Suggested"}</span><button onClick={() => setSearchOpen(false)}>{isArabic ? "حمل يومي" : "Daily carry"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "سفر" : "Travel"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "عناية" : "Care"}</button></div></div></div>}
 
       <div className={`drawer-backdrop ${cartOpen ? "drawer-backdrop--open" : ""}`} onClick={() => setCartOpen(false)} />
       <aside className={`bag-drawer ${cartOpen ? "bag-drawer--open" : ""}`} aria-label={isArabic ? "حقيبة التسوق" : isFrench ? "Sac" : "Shopping bag"}>
@@ -316,7 +332,7 @@ export default function Home() {
         {cartCount && cartItem ? <div className="bag-drawer__filled"><div className="bag-item"><img src={cartItem.image} alt={cartItem.name} /><div><p>{cartItem.name}</p><small>{cartItem.category}</small><b>{cartItem.price}</b><div className="quantity"><button type="button" onClick={removeOne}><Minus size={13} /></button><span>{cartCount}</span><button type="button" onClick={() => setCartCount((count) => count + 1)}><Plus size={13} /></button></div></div></div><div className="bag-benefits"><p><Truck size={16} /> {isArabic ? "توصيل مجاني للطلبات فوق 150 دولار" : isFrench ? "Livraison offerte dès 150 $" : "Complimentary delivery over $150"}</p><p><PackageCheck size={16} /> {isArabic ? "الدفع عند الاستلام متاح" : isFrench ? "Paiement à la livraison disponible" : "Cash on Delivery available"}</p></div><button type="button" className="checkout-button" onClick={openCheckout}>{isArabic ? "إتمام الطلب" : isFrench ? "Commander" : "Checkout"} <ArrowRight size={16} /></button><span className="bag-note">{isArabic ? "اختر الدفع عند الاستلام في الخطوة التالية." : isFrench ? "Choisissez le paiement à la livraison à l’étape suivante." : "Choose Cash on Delivery at the next step."}</span></div> : <div className="bag-drawer__empty"><ShoppingBag size={28} strokeWidth={1.35} /><h3>{isArabic ? "حقيبتك فارغة." : isFrench ? "Votre sac est vide." : "Your bag is empty."}</h3><p>{isArabic ? "ابدأ بقطعة ستعود إليها كثيراً." : isFrench ? "Commencez par un objet que vous aimerez retrouver souvent." : "Start with an object you will reach for often."}</p><button type="button" onClick={() => { setCartOpen(false); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>{isArabic ? "اكتشف التشكيلة" : isFrench ? "Explorer la sélection" : "Explore the edit"} <ArrowRight size={15} /></button></div>}
       </aside>
 
-      {checkoutOpen && <div className="checkout-overlay" role="dialog" aria-modal="true" aria-label={isArabic ? "إتمام طلب الدفع عند الاستلام" : "Cash on Delivery checkout"}><div className="checkout-card"><button className="checkout-close" type="button" onClick={() => setCheckoutOpen(false)} aria-label={isArabic ? "إغلاق الطلب" : "Close checkout"}><X size={20} /></button>{orderSubmitted ? <div className="order-success"><span><Check size={26} /></span><p className="kicker">{isArabic ? "تم تسجيل طلبك" : "Order request recorded"}</p><h2>{isArabic ? <>سنؤكد<br /><em>تفاصيل التوصيل.</em></> : <>We’ll confirm your<br /><em>delivery details.</em></>}</h2><p>{isArabic ? "تم تسجيل اختيار الدفع عند الاستلام. هذا النموذج التجريبي لا يرسل طلباً حقيقياً بعد." : "Your Cash on Delivery selection has been noted. This prototype does not submit a real order yet."}</p><button type="button" onClick={() => setCheckoutOpen(false)}>{isArabic ? "العودة إلى الاستوديو" : "Back to the atelier"} <ArrowRight size={15} /></button></div> : <form onSubmit={submitCheckout}><p className="kicker">{isArabic ? "إتمام الطلب / الخطوة 01" : "Checkout / step 01"}</p><h2>{isArabic ? "تفاصيل التوصيل" : "Delivery details"}</h2><p className="checkout-card__intro">{isArabic ? "يُدفع المبلغ عند وصول الطلب." : "Your total is collected when the order is delivered."}</p><div className="checkout-fields"><label>{isArabic ? "الاسم الكامل" : "Full name"}<input required placeholder={isArabic ? "الاسم المستلم" : "Name on the delivery"} /></label><label>{isArabic ? "رقم الهاتف" : "Phone number"}<input required type="tel" placeholder={isArabic ? "لتأكيد التوصيل" : "For delivery confirmation"} /></label><label className="span-two">{isArabic ? "عنوان التوصيل" : "Delivery address"}<input required placeholder={isArabic ? "الشارع والبناية والمنطقة" : "Street, building, area"} /></label><label>{isArabic ? "المدينة" : "City"}<input required placeholder={isArabic ? "مدينتك" : "Your city"} /></label><label>{isArabic ? "ملاحظة الطلب" : "Order note"}<input placeholder={isArabic ? "اختياري" : "Optional"} /></label></div><fieldset><legend>{isArabic ? "طريقة الدفع" : "Payment method"}</legend><label className="payment-option payment-option--selected"><input type="radio" name="payment" defaultChecked /><span><Truck size={19} /></span><div><b>{isArabic ? "الدفع عند الاستلام" : "Cash on Delivery"}</b><small>{isArabic ? "ادفع للمندوب عند وصول طلبك." : "Pay the courier once your order arrives."}</small></div><Check size={16} /></label><label className="payment-option payment-option--muted"><input type="radio" name="payment" disabled /><span><ShieldCheck size={19} /></span><div><b>{isArabic ? "الدفع عبر الإنترنت" : "Pay online"}</b><small>{isArabic ? "أضف مزود دفع لاحقاً." : "Connect a payment provider later."}</small></div></label></fieldset><button className="place-order" type="submit">{isArabic ? "تقديم طلب الدفع عند الاستلام" : "Place Cash on Delivery request"} <ArrowRight size={16} /></button><p className="checkout-footnote">{isArabic ? "هذا نموذج متجر قابل للتعديل. اربط Shopify أو نظاماً آخر لتلقي الطلبات الحقيقية." : "This is an editable storefront prototype. Connect Shopify or another commerce backend to collect real order data."}</p></form>}</div></div>}
+      {checkoutOpen && <div className="checkout-overlay" role="dialog" aria-modal="true" aria-label={isArabic ? "إتمام طلب الدفع عند الاستلام" : "Cash on Delivery checkout"}><div className="checkout-card"><button className="checkout-close" type="button" onClick={() => setCheckoutOpen(false)} aria-label={isArabic ? "إغلاق الطلب" : "Close checkout"}><X size={20} /></button>{orderSubmitted ? <div className="order-success"><span><Check size={26} /></span><p className="kicker">{isArabic ? "تم إرسال الطلب" : isFrench ? "Demande envoyée" : "Order request sent"}</p><h2>{isArabic ? <>سنؤكد<br /><em>تفاصيل التوصيل.</em></> : isFrench ? <>Nous confirmerons<br /><em>les détails de livraison.</em></> : <>We’ll confirm your<br /><em>delivery details.</em></>}</h2><p>{isArabic ? "أُرسل طلب الدفع عند الاستلام إلى فريق بانكو. سنتصل بك قبل الشحن." : isFrench ? "Votre demande de paiement à la livraison a été envoyée à Panco. Nous vous appellerons avant l’expédition." : "Your Panco Cash on Delivery request has been sent to the order desk. We will call before dispatch."}</p><button type="button" onClick={() => setCheckoutOpen(false)}>{isArabic ? "العودة إلى الاستوديو" : isFrench ? "Retour à l’atelier" : "Back to the atelier"} <ArrowRight size={15} /></button></div> : <form onSubmit={submitCheckout}><p className="kicker">{isArabic ? "إتمام الطلب / الخطوة 01" : isFrench ? "Commande / étape 01" : "Checkout / step 01"}</p><h2>{isArabic ? "تفاصيل التوصيل" : isFrench ? "Détails de livraison" : "Delivery details"}</h2><p className="checkout-card__intro">{isArabic ? "يُدفع المبلغ عند وصول الطلب." : isFrench ? "Le montant est collecté à la livraison." : "Your total is collected when the order is delivered."}</p><div className="checkout-fields"><label>{isArabic ? "الاسم الكامل" : isFrench ? "Nom complet" : "Full name"}<input required name="customerName" placeholder={isArabic ? "الاسم المستلم" : isFrench ? "Nom du destinataire" : "Name on the delivery"} /></label><label>{isArabic ? "رقم الهاتف" : isFrench ? "Numéro de téléphone" : "Phone number"}<input required name="phone" type="tel" placeholder={isArabic ? "لتأكيد التوصيل" : isFrench ? "Pour confirmer la livraison" : "For delivery confirmation"} /></label><label className="span-two">{isArabic ? "عنوان التوصيل" : isFrench ? "Adresse de livraison" : "Delivery address"}<input required name="address" placeholder={isArabic ? "الشارع والبناية والمنطقة" : isFrench ? "Rue, bâtiment, quartier" : "Street, building, area"} /></label><label>{isArabic ? "المدينة" : isFrench ? "Ville" : "City"}<input required name="city" placeholder={isArabic ? "مدينتك" : isFrench ? "Votre ville" : "Your city"} /></label><label>{isArabic ? "ملاحظة الطلب" : isFrench ? "Note de commande" : "Order note"}<input name="note" placeholder={isArabic ? "اختياري" : isFrench ? "Facultatif" : "Optional"} /></label></div><fieldset><legend>{isArabic ? "طريقة الدفع" : isFrench ? "Mode de paiement" : "Payment method"}</legend><label className="payment-option payment-option--selected"><input type="radio" name="payment" defaultChecked /><span><Truck size={19} /></span><div><b>{isArabic ? "الدفع عند الاستلام" : isFrench ? "Paiement à la livraison" : "Cash on Delivery"}</b><small>{isArabic ? "ادفع للمندوب عند وصول طلبك." : isFrench ? "Payez le coursier à l’arrivée de votre commande." : "Pay the courier once your order arrives."}</small></div><Check size={16} /></label><label className="payment-option payment-option--muted"><input type="radio" name="payment" disabled /><span><ShieldCheck size={19} /></span><div><b>{isArabic ? "الدفع عبر الإنترنت" : isFrench ? "Paiement en ligne" : "Pay online"}</b><small>{isArabic ? "أضف مزود دفع لاحقاً." : isFrench ? "Ajoutez un prestataire de paiement plus tard." : "Connect a payment provider later."}</small></div></label></fieldset>{submitCashOnDelivery.error && <p className="direct-order-error" role="alert">{submitCashOnDelivery.error.message}</p>}<button className="place-order" type="submit" disabled={submitCashOnDelivery.isPending}>{submitCashOnDelivery.isPending ? (isArabic ? "يجري إرسال الطلب…" : isFrench ? "Envoi de la demande…" : "Sending request…") : (isArabic ? "تقديم طلب الدفع عند الاستلام" : isFrench ? "Envoyer la demande" : "Place Cash on Delivery request")} <ArrowRight size={16} /></button><p className="checkout-footnote">{isArabic ? "يُرسل طلبك بأمان إلى فريق بانكو للتأكيد." : isFrench ? "Votre demande est envoyée de manière sécurisée à Panco pour confirmation." : "Your request is sent securely to the Panco order desk for confirmation."}</p></form>}</div></div>}
     </div>
   );
 }

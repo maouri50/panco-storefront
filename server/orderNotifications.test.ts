@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { sendOrderNotifications, type CashOnDeliveryOrder, type NotificationConfig } from "./orderNotifications";
 
 const order: CashOnDeliveryOrder = {
-  orderReference: "NA-TEST-01",
+  orderReference: "PA-TEST-01",
   productName: "Atlas Card Wallet",
   productPrice: "$78",
   color: "Oxblood",
@@ -16,7 +16,7 @@ const order: CashOnDeliveryOrder = {
 const emailOnlyConfig: NotificationConfig = {
   resendApiKey: "resend-test-key",
   notificationEmail: "owner@example.com",
-  emailFrom: "North Atelier <onboarding@resend.dev>",
+  emailFrom: "Panco <onboarding@resend.dev>",
   metaAccessToken: "",
   metaPhoneNumberId: "",
   whatsappDestination: "",
@@ -38,7 +38,7 @@ describe("sendOrderNotifications", () => {
     );
     expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string)).toMatchObject({
       to: ["owner@example.com"],
-      subject: "New COD order NA-TEST-01 — Atlas Card Wallet",
+      subject: "New COD order PA-TEST-01 — Atlas Card Wallet",
     });
   });
 });

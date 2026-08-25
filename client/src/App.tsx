@@ -1,4 +1,4 @@
-/** North Atelier style note — a light paper theme supports the Patina Modernism storefront. */
+/** Panco style note — a light paper theme supports the Patina Modernism storefront. */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";

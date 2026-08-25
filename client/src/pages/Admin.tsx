@@ -124,7 +124,7 @@ export default function Admin() {
     else createItem.mutate(item);
   };
 
-  if (loading) return <main className="admin-shell admin-state"><p className="admin-eyebrow">North Atelier / Admin</p><h1>Opening the<br /><em>catalog ledger.</em></h1></main>;
+  if (loading) return <main className="admin-shell admin-state"><p className="admin-eyebrow">Panco / Admin</p><h1>Opening the<br /><em>catalog ledger.</em></h1></main>;
 
   if (!isAuthenticated) {
     return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>Sign in to<br /><em>manage objects.</em></h1><p>The catalog desk is restricted to the project owner. Sign in with the owner account to add, edit, publish, or remove products.</p><button type="button" className="admin-primary" onClick={() => startLogin()}>Sign in as owner <ChevronRight size={16} /></button></main>;
@@ -141,7 +141,7 @@ export default function Admin() {
   const mutationError = createItem.error ?? updateItem.error ?? removeItem.error ?? importCatalog.error;
 
   return <main className="admin-shell">
-    <header className="admin-header"><Link href="/" className="admin-brand"><span>N/A</span> North Atelier</Link><div><p>Catalog desk / owner access</p><button type="button" onClick={() => logout()} aria-label="Sign out"><LogOut size={16} /></button></div></header>
+    <header className="admin-header"><Link href="/" className="admin-brand"><span>P</span> Panco</Link><div><p>Catalog desk / owner access</p><button type="button" onClick={() => logout()} aria-label="Sign out"><LogOut size={16} /></button></div></header>
     <section className="admin-intro"><div><p className="admin-eyebrow">Private catalog desk</p><h1>Objects,<br /><em>under your hand.</em></h1><p>Add new products, correct details, change order, and control whether an item is visible in the storefront.</p></div><div className="admin-intro__meta"><span><ClipboardList size={17} /> {items.length} managed items</span><span><Check size={17} /> Owner-only access</span></div></section>
 
     {items.length === 0 && !creatingFirst ? <section className="admin-import"><div><PackagePlus size={27} /><h2>Start your catalog<br />your way.</h2><p>Import the original studio edit as a starting point, or create your first item from scratch.</p></div><div className="admin-import__actions"><button className="admin-secondary" type="button" disabled={saving} onClick={() => { setCreatingFirst(true); setForm(blankForm(1)); setNotice(""); }}>Create first item <Plus size={16} /></button><button className="admin-primary" type="button" disabled={saving} onClick={() => importCatalog.mutate()}>{saving ? "Importing…" : "Import current catalog"} <ChevronRight size={16} /></button></div></section> : <section className="admin-workspace">

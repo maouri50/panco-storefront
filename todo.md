@@ -1,4 +1,4 @@
-# North Atelier Reference-Inspired Revision
+# Panco Storefront Revision
 
 - [x] Map the reference homepage into original structural sections and interaction patterns.
 - [x] Establish a clearly documented, easy-to-edit color token system.
@@ -10,10 +10,11 @@
 - [x] Confirm desktop and mobile rendering and test the primary interactive controls.
 - [x] Compare email and WhatsApp notification options for Cash on Delivery orders.
 - [x] Confirm the Resend sender strategy and owner inbox for new Cash on Delivery orders.
-- [ ] Create or connect the Resend API key and configure its server-side sender settings.
+- [x] Create or connect the Resend API key and configure its server-side sender settings.
 - [ ] Set up the Meta WhatsApp Business account, business number, and permanent API credentials.
-- [ ] Add secure server-side order submission and owner notification delivery.
-- [ ] Test a complete Cash on Delivery order notification without storing live customer data during development.
+- [x] Add secure server-side product-page order submission and owner notification delivery.
+- [x] Wire the Home checkout flow to the real Cash on Delivery submission procedure and remove its prototype-only order message.
+- [x] Test a complete Cash on Delivery order notification without storing live customer data during development.
 - [ ] Run a controlled WhatsApp notification test for a new Cash on Delivery order.
 - [x] Define the editable catalog fields and owner-only admin access rules.
 - [x] Create the catalog schema, database migration, and owner-only management procedures.
@@ -46,8 +47,38 @@
 - [x] Verify English is the default locale for a first-time visitor without a saved preference.
 - [x] Preserve manual English, French, and Arabic choices from the top language selector after selection.
 - [x] Map all customer-facing, multilingual, metadata, and admin references to the North Atelier name.
-- [ ] Rename the public storefront, product pages, metadata, and admin text to Interpanco.
-- [ ] Verify Interpanco branding across English, French, and Arabic routes.
+- [x] Rename the public storefront, product pages, metadata, and admin text to Interpanco.
+- [x] Verify Interpanco branding across English, French, and Arabic routes.
+- [x] Sweep remaining North Atelier, N/A, and northatelier references and replace any residual customer-facing or owner-facing branding.
+- [x] Verify Interpanco wordmark, page title, footer, search/menu labels, and product ledger across English, French, Arabic, and admin routes.
+- [x] Explicitly inspect the browser title and description after the Interpanco rename.
+- [x] Open the renamed menu and search controls to verify their Interpanco labels in English, French, and Arabic.
+- [x] Open the standalone Interpanco search overlay in English, French, and Arabic and verify its visible localized prompts.
+- [x] Collect the Resend API key and confirmed owner inbox through the secure configuration card.
+- [x] Validate the configured Resend settings without exposing credentials to the storefront.
+- [x] Run a controlled Cash on Delivery email-notification test after configuration.
+- [ ] Inspect the Resend account and existing sender configuration after secure user login.
+- [x] Create a dedicated Interpanco sending key in Resend with explicit user confirmation.
+- [x] Diagnose the Resend authorization response without exposing the saved API key.
+- [x] Replace the incompatible Resend domains authorization probe with a safe restricted-key configuration check before the controlled email test.
+- [x] Create a replacement Interpanco Orders sending key after the prior configured key returned an authorization error.
+- [x] Stop live notification testing after identifying that the connected Resend account belongs to another project.
+- [x] Confirm whether to revoke the Interpanco test keys from the incorrect Resend account.
+- [x] Revoke both Interpanco test keys from the incorrect Resend account while leaving unrelated credentials untouched.
+- [x] Connect the intended Resend account before resuming Panco Cash on Delivery email notifications.
+- [ ] Independently confirm the dedicated Resend account for saadyou50@gmail.com, beyond the user's external setup report.
+- [ ] Confirm the dedicated Panco Orders key scope and account-verification state, beyond the successful send result.
+- [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
+- [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
+- [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
+- [x] Update Panco branding across English, French, Arabic, metadata, admin labels, and order-notification copy.
+- [x] Validate the dedicated saadyou50 Panco Resend key and run one controlled Panco order-notification test.
+- [x] Validate the dedicated saadyou50 Panco Resend key through a successful controlled Cash on Delivery submission.
+- [x] Send one controlled Panco Cash on Delivery test notification and confirm the storefront reports request delivery success.
+- [x] Replace all remaining customer-facing and owner-facing Interpanco references with Panco across localization, metadata, catalog, admin, notification, and styling sources.
+- [x] Run TypeScript and unit checks after the Panco rename and verify English, French, Arabic, title, and metadata show Panco consistently.
+- [x] Search for and remove residual Interpanco and legacy brand strings before finalizing the Panco rename.
+- [x] Confirm the Panco rename compiles, localized Panco and order-notification unit tests pass, and English, French, and Arabic storefronts display Panco consistently.
 - [x] Locate and tighten the multiline collection-heading spacing so its second line sits closer to the first.
 - [x] Verify the refined collection heading at desktop and mobile widths.
 - [x] Confirm the compact collection-heading CSS adjustment is present and visually matches the requested close two-line treatment.

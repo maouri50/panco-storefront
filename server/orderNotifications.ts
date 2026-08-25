@@ -33,7 +33,7 @@ export function getNotificationConfig(): NotificationConfig {
   return {
     resendApiKey: process.env.RESEND_API_KEY ?? "",
     notificationEmail: process.env.ORDER_NOTIFICATION_EMAIL ?? "",
-    emailFrom: process.env.ORDER_NOTIFICATION_FROM ?? "North Atelier <onboarding@resend.dev>",
+    emailFrom: process.env.ORDER_NOTIFICATION_FROM ?? "Panco <onboarding@resend.dev>",
     metaAccessToken: process.env.META_WHATSAPP_ACCESS_TOKEN ?? "",
     metaPhoneNumberId: process.env.META_WHATSAPP_PHONE_NUMBER_ID ?? "",
     whatsappDestination: process.env.META_WHATSAPP_OWNER_NUMBER ?? "",

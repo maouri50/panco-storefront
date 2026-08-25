@@ -1,4 +1,4 @@
-/** North Atelier catalog data — edit this file to update product names, pricing, imagery, variants, and product-detail copy. */
+/** Panco catalog data — edit this file to update product names, pricing, imagery, variants, and product-detail copy. */
 export type Product = {
   slug: string;
   name: string;

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { sendOrderNotifications } from "./orderNotifications";
 import { createCatalogItem, deleteCatalogItem, listCatalogItems, seedCatalogItems, updateCatalogItem } from "./catalogStore";
 import { initialCatalogItems } from "./catalogDefaults";
+import { createCashOnDeliveryReference } from "./orderReference";
 
 const catalogInput = z.object({
   slug: z.string().trim().min(2).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and hyphens only."),
@@ -55,7 +56,7 @@ export const appRouter = router({
         }),
       )
       .mutation(async ({ input }) => {
-        const orderReference = `NA-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+        const orderReference = createCashOnDeliveryReference();
 
         try {
           const notifications = await sendOrderNotifications({ ...input, orderReference });
