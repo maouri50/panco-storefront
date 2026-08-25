@@ -30,3 +30,5 @@
 - [x] Restore the development server after the reported outage and confirm the storefront responds.
 - [x] Verify the recovered storefront loads successfully in the browser after restart.
 - [x] Deliver the revised project checkpoint and editing guidance.
+- [x] Restore the pre-sale product-page checkpoint to remove the sale color treatment and full sale-layout redesign.
+- [x] Verify the restored product page no longer includes the two reverted sale-layout changes.
