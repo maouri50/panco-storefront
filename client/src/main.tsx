@@ -7,8 +7,16 @@ import superjson from "superjson";
 import App from "./App";
 import { startLogin } from "./const";
 import "./index.css";
+import { shouldReportTrpcQueryError, shouldRetryTrpcQuery } from "./lib/trpcRecovery";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => shouldRetryTrpcQuery(failureCount, error instanceof Error ? error.message : String(error)),
+      retryDelay: (attempt) => 250 * attempt,
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -25,7 +33,10 @@ queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.query.state.error;
     redirectToLoginIfUnauthorized(error);
-    console.error("[API Query Error]", error);
+    const message = error instanceof Error ? error.message : String(error);
+    if (shouldReportTrpcQueryError(event.query.state.fetchFailureCount, message)) {
+      console.error("[API Query Error]", error);
+    }
   }
 });
 

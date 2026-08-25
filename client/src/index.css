@@ -553,13 +553,13 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .product-page__nav a:not(.product-page__brand) { padding: 7px 0; text-transform: uppercase; font-size: 8px; letter-spacing: .14em; }
 .product-page__nav a:not(.product-page__brand):hover { opacity: .56; }
 .product-page__nav button { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--ink); font-size: 9px; }
-.product-detail { display: grid; grid-template-columns: minmax(0, .98fr) minmax(470px, 1.02fr); max-width: 1600px; margin: 0 auto; }
-.product-detail__gallery { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; padding: 80px 0 52px 3.4vw; }
-.gallery-thumbs { display: grid; align-content: start; gap: 9px; }
-.gallery-thumbs button { aspect-ratio: 1.12; padding: 0; overflow: hidden; border: 1px solid transparent; background: var(--sand); opacity: .48; transition: opacity .2s var(--ease-out), border-color .2s var(--ease-out); }
+.product-detail { display: grid; grid-template-columns: minmax(590px, 1.04fr) minmax(500px, .96fr); max-width: 1700px; margin: 0 auto; }
+.product-detail__gallery { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; padding: 0 0 58px 3.4vw; }
+.gallery-thumbs { display: grid; align-content: start; gap: 10px; padding-top: 10px; }
+.gallery-thumbs button { aspect-ratio: 1.1; padding: 0; overflow: hidden; border: 1px solid transparent; background: var(--sand); opacity: .5; transition: opacity .2s var(--ease-out), border-color .2s var(--ease-out); }
 .gallery-thumbs button.is-active { border-color: var(--ink); opacity: 1; }
 .gallery-thumbs img { width: 100%; height: 100%; display: block; object-fit: cover; }
-.gallery-stage { position: relative; min-height: clamp(480px, 52vw, 650px); overflow: hidden; background: var(--sand); }
+.gallery-stage { position: relative; min-height: clamp(540px, 56vw, 760px); overflow: hidden; background: var(--sand); }
 .gallery-stage > img { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; animation: hero-fade .3s var(--ease-out); }
 .gallery-stage > span { position: absolute; left: 17px; bottom: 16px; padding: 6px 8px; background: rgba(246,245,242,.88); text-transform: uppercase; font-size: 7px; letter-spacing: .13em; }
 .gallery-grid { display: none; }
@@ -570,7 +570,7 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .gallery-grid__plate--2 img { object-position: 70% 37%; transform: scale(1.32); }
 .gallery-grid__plate--3 img { object-position: 48% 86%; transform: scale(1.22); }
 .gallery-grid__plate:hover img { transform: scale(1.4); }
-.product-detail__purchase { position: sticky; top: 0; align-self: start; min-height: 100vh; padding: 88px clamp(38px, 6vw, 106px) 54px; border-left: 1px solid var(--line); }
+.product-detail__purchase { position: sticky; top: 0; align-self: start; min-height: 100vh; padding: 52px clamp(38px, 5vw, 84px) 54px; border-left: 1px solid var(--line); }
 .product-detail__purchase::before { content: "P"; position: absolute; top: 31px; right: 34px; width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-family: "DM Mono", ui-monospace, monospace; font-size: 9px; font-weight: 700; letter-spacing: -.1em; opacity: .13; pointer-events: none; }
 .breadcrumb { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; color: var(--muted); text-transform: uppercase; font-size: 7px; letter-spacing: .11em; }
 .breadcrumb a:hover { color: var(--ink); }
@@ -689,12 +689,14 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .direct-order-success h2 { font-size: clamp(44px, 5vw, 65px); }
 .direct-order-success > p:not(.detail-kicker) { max-width: 405px; margin: 23px 0 25px; font-family: "Playfair Display", Georgia, serif; font-size: 19px; line-height: 1.17; color: var(--muted); }
 .direct-order-success button { display: inline-flex; align-items: center; gap: 8px; padding: 0 0 7px; border: 0; border-bottom: 1px solid var(--ink); background: transparent; text-transform: uppercase; font-size: 8px; letter-spacing: .12em; }
-.inline-order-card { margin: 18px 0; padding: 31px; border: 1px solid var(--line); border-radius: 25px; background: #fff; box-shadow: 0 18px 32px rgba(18,18,18,.10); }
-.inline-order-card h2 { margin: 5px 0 0; font-family: "Playfair Display", Georgia, serif; font-size: 44px; font-weight: 400; letter-spacing: -.065em; line-height: .86; }
-.inline-order-card .direct-order-fields { margin-top: 25px; }
-.inline-order-card .direct-order-product { margin-top: 22px; }
-.inline-order-card .direct-order-note { margin-top: 11px; }
-.inline-order-card .direct-order-submit { min-height: 56px; border-radius: 16px; background: var(--order-confirm); color: #fff; font-size: 9px; letter-spacing: .16em; }
+.inline-order-card { margin: 25px 0 0; padding: 25px; border: 1px solid rgba(29,29,27,.2); border-radius: 19px; background: #fff; box-shadow: 0 16px 28px rgba(18,18,18,.09); }
+.inline-order-card__heading { display: inline-flex; align-items: center; gap: 8px; margin: 0; color: var(--ink); text-transform: uppercase; font-size: 8px; font-weight: 600; letter-spacing: .17em; }
+.inline-order-card__heading svg { color: var(--ink); }
+.inline-order-card .direct-order-fields { margin-top: 20px; gap: 14px 16px; }
+.inline-order-card .direct-order-fields label { gap: 7px; color: var(--ink); font-size: 7px; font-weight: 600; letter-spacing: .11em; }
+.inline-order-card .direct-order-fields input { height: 46px; padding: 0 15px; border: 1px solid rgba(29,29,27,.14); border-radius: 11px; background: #fff; font-family: "DM Mono", ui-monospace, monospace; font-size: 10px; letter-spacing: 0; }
+.inline-order-card .direct-order-fields input::placeholder { color: #9d9b99; opacity: 1; }
+.inline-order-card .direct-order-submit { min-height: 56px; margin-top: 20px; border-radius: 14px; background: var(--order-confirm); color: #fff; font-size: 9px; letter-spacing: .16em; }
 .inline-order-card .direct-order-submit:hover { background: #056128; }
 .panco-order-success { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(350px, .82fr); gap: 34px; max-width: 1160px; margin: 0 auto; padding: clamp(52px, 7vw, 106px) 4.8vw; }
 .panco-order-success__main, .panco-order-summary { border: 1px solid var(--line); border-radius: 24px; background: #fff; }

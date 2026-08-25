@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { sendApiNotFound } from "./apiFallback";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -44,6 +45,10 @@ async function startServer() {
       createContext,
     })
   );
+  // Keep unmatched API calls out of the Vite/SPA HTML fallback. A caller that
+  // expects tRPC JSON must receive JSON even if a temporary or malformed API
+  // path misses the registered middleware.
+  app.use("/api", sendApiNotFound);
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

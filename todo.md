@@ -83,8 +83,10 @@
 - [x] Verify the homepage header transition at desktop and mobile breakpoints.
 - [x] Keep the English Panco shop heading “Objects for the everyday.” on one line while preserving localized heading layouts.
 - [x] Verify the one-line English shop heading at desktop and mobile widths.
-- [ ] Trace and fix the homepage tRPC request that receives an HTML document instead of JSON.
-- [ ] Verify the Panco homepage loads without tRPC JSON parsing errors in the browser console.
+- [x] Add bounded client recovery for transient tRPC HTML fallback responses during Panco homepage startup.
+- [x] Capture current first-path Panco tRPC evidence confirming the public endpoint returns `application/json` rather than an HTML document.
+- [x] Add an API JSON fallback guard so unmatched `/api` paths cannot reach the Panco SPA HTML fallback.
+- [x] Re-verify `/?from_webdev=1` with current tRPC JSON network evidence and no browser parsing error.
 - [x] Audit the complete Panco project export for secrets and generated files before pushing to GitHub.
 - [x] Create a private GitHub repository and push the complete Panco website source.
 - [x] Verify the GitHub repository contains the complete source and provide the repository link.
@@ -103,6 +105,27 @@
 - [x] Place the Panco Cash on Delivery form adjacent to the selected product image on desktop while preserving a clear mobile flow.
 - [x] Add a Panco post-order thank-you view with the real purchased product image, order reference, customer name, totals, and delivery details.
 - [x] Verify the completed-order view after an owner-approved, non-customer browser form test.
+- [x] Generate original additional Panco product-gallery images with cohesive leather-goods styling and no copied source imagery.
+- [x] Add the new Panco product images to the existing product galleries for review without changing other storefront behavior.
+- [x] Verify the expanded Panco product galleries on desktop and mobile before further visual changes.
+- [x] Simplify the Panco Cash on Delivery form to the four requested fields: full name, phone, address, and city.
+- [x] Update the Panco order-card typography, top icon, and green confirmation treatment to match the requested clean visual direction.
+- [x] Verify the revised Panco order card at desktop and mobile widths.
+- [x] Remove failed Panco image-generation placeholders from all product galleries immediately.
+- [x] Generate and integrate only successfully completed original Panco gallery images without broken placeholders.
+- [x] Verify every Panco product-gallery thumbnail and selected image loads successfully before delivery.
+- [x] Analyze the reference duffle-bag gallery image sizing, thumbnail interaction, and responsive behavior.
+- [x] Apply the resulting gallery sizing and navigation improvements to the original Panco product pages.
+- [x] Verify the refined original Panco gallery at desktop and mobile widths.
+- [ ] Analyze the reference contact-page layout and interaction pattern without copying its branding or text.
+- [ ] Create an original dedicated Panco contact route with clear customer inquiry details and form handling.
+- [ ] Verify the Panco contact route across desktop and mobile layouts.
+- [x] Recompose Panco product pages into the requested desktop thumbnail rail, tall selected-image stage, and right-side product ledger.
+- [x] Align the simplified four-field Panco Cash on Delivery card beneath the right-side product ledger.
+- [x] Verify the recomposed Panco product page at desktop and mobile widths.
+- [x] Confirm the generated Atlas gallery image URLs have resolved to final product photography rather than temporary or failed placeholders.
+- [x] Re-verify the resolved Atlas gallery thumbnail rail and selected stage image at desktop and mobile widths.
+- [x] Record explicit desktop and mobile evidence that the Atlas gallery uses completed product photography with no generating or failed placeholder.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

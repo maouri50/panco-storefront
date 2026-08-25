@@ -22,7 +22,11 @@ export const catalogProducts: Product[] = [
     price: "$78",
     was: "$92",
     image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg",
-    gallery: ["/manus-storage/north-atelier-cardholder_12ba7095.jpg", "/manus-storage/north-atelier-cardholder_12ba7095.jpg", "/manus-storage/north-atelier-cardholder_12ba7095.jpg"],
+    gallery: [
+      "/manus-storage/north-atelier-cardholder_12ba7095.jpg",
+      "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
+      "/manus-storage/panco-atlas-wallet-interior_26a2cff9.jpg",
+    ],
     swatches: ["#66363f", "#352a2a"],
     colors: [
       { name: "Oxblood", color: "#66363f", image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg" },
