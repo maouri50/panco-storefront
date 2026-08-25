@@ -15,9 +15,18 @@
 - [ ] Add secure server-side order submission and owner notification delivery.
 - [ ] Test a complete Cash on Delivery order notification without storing live customer data during development.
 - [ ] Run a controlled WhatsApp notification test for a new Cash on Delivery order.
+- [x] Define the editable catalog fields and owner-only admin access rules.
+- [x] Create the catalog schema, database migration, and owner-only management procedures.
+- [x] Build the `/admin` interface for adding, editing, and removing catalog items.
+- [x] Connect storefront catalog rendering to managed inventory data with a safe fallback.
+- [ ] Test owner access, catalog changes, and public storefront updates.
+- [x] Map the supplied mobile product-page layout into original North Atelier sections and controls.
+- [x] Rebuild the product gallery, purchase controls, delivery card, and information hierarchy around the supplied mobile reference.
+- [x] Refine the product notes, related-items, and footer modules to match the reference’s mobile reading rhythm without fabricating customer content.
+- [x] Verify the redesigned product page on mobile and desktop.
 - [x] Confirm the reference-inspired charcoal, stone-grey, and warm off-white palette direction.
 - [x] Replace the current accent system with the approved neutral palette across the storefront and product pages.
 - [x] Verify the neutral palette has readable contrast and consistent responsive behavior on desktop and mobile.
 - [x] Restore the development server after the reported outage and confirm the storefront responds.
 - [x] Verify the recovered storefront loads successfully in the browser after restart.
-- [ ] Deliver the revised project checkpoint and editing guidance.
+- [x] Deliver the revised project checkpoint and editing guidance.

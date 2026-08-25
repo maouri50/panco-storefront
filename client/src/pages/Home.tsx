@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { catalogProducts, type Product } from "@/lib/catalog";
+import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
@@ -73,6 +74,7 @@ const faqItems = [
 const promos = ["Complimentary delivery over $150", "Cash on Delivery available", "Small-run objects, dispatched weekly"];
 
 export default function Home() {
+  const { products } = useManagedCatalog();
   const [activeSlide, setActiveSlide] = useState(0);
   const [promoIndex, setPromoIndex] = useState(0);
   const [cartCount, setCartCount] = useState(0);
@@ -191,7 +193,7 @@ export default function Home() {
             <a href="#collections" className="underlined-link">See all collections <ArrowRight size={15} /></a>
           </div>
           <div className="product-rail">
-            {catalogProducts.map((product, index) => (
+            {products.map((product, index) => (
               <article className="catalog-card" key={product.name}>
                 <div className="catalog-card__image">
                   <Link href={`/products/${product.slug}`} className="catalog-card__link"><img src={product.image} alt={product.name} /></Link>
@@ -243,7 +245,7 @@ export default function Home() {
 
         <section className="small-things-section page-section">
           <div className="small-things-copy"><p className="kicker">Small good things</p><h2>Details worth<br /><em>keeping close.</em></h2><a href="#shop" className="underlined-link">Discover small goods <ArrowRight size={15} /></a></div>
-          <div className="small-things-product"><Link href={`/products/${catalogProducts[0].slug}`}><img src="/manus-storage/north-atelier-cardholder_12ba7095.jpg" alt="North Atelier card wallet" /></Link><div><span>New / 04</span><h3><Link href={`/products/${catalogProducts[0].slug}`}>Atlas Card Wallet</Link></h3><p>Compact, exacting, and soft at the edges.</p><button type="button" onClick={() => addToCart(catalogProducts[0])}>Add to bag <Plus size={14} /></button></div></div>
+          <div className="small-things-product"><Link href={`/products/${products[0].slug}`}><img src={products[0].image} alt={products[0].name} /></Link><div><span>New / 04</span><h3><Link href={`/products/${products[0].slug}`}>{products[0].name}</Link></h3><p>{products[0].description}</p><button type="button" onClick={() => addToCart(products[0])}>Add to bag <Plus size={14} /></button></div></div>
         </section>
 
         <section id="journal" className="journal-section">
