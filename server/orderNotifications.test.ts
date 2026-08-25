@@ -23,16 +23,18 @@ const emailOnlyConfig: NotificationConfig = {
   whatsappTemplateName: "panco_cod_alert",
   whatsappTemplateLanguage: "en_US",
   metaGraphVersion: "v23.0",
+  telegramBotToken: "",
+  telegramChatId: "",
 };
 
 describe("sendOrderNotifications", () => {
-  it("sends a structured Resend email and leaves WhatsApp ready but inactive without Meta credentials", async () => {
+  it("sends a structured Resend email and leaves Telegram and WhatsApp inactive without credentials", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "email-1" }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await sendOrderNotifications(order, emailOnlyConfig);
 
-    expect(result).toEqual({ email: "sent", whatsapp: "not_configured" });
+    expect(result).toEqual({ email: "sent", whatsapp: "not_configured", telegram: "not_configured" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.resend.com/emails",
@@ -57,7 +59,7 @@ describe("sendOrderNotifications", () => {
       whatsappDestination: "+212600000000",
     });
 
-    expect(result).toEqual({ email: "not_configured", whatsapp: "sent" });
+    expect(result).toEqual({ email: "not_configured", whatsapp: "sent", telegram: "not_configured" });
     expect(fetchMock).toHaveBeenCalledWith(
       "https://graph.facebook.com/v23.0/123456789/messages",
       expect.objectContaining({ method: "POST", headers: expect.objectContaining({ Authorization: "Bearer meta-test-token" }) }),
@@ -84,6 +86,30 @@ describe("sendOrderNotifications", () => {
           },
         ],
       },
+    });
+  });
+
+  it("sends a Panco Cash on Delivery summary to the configured Telegram owner chat", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true, result: { message_id: 101 } }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await sendOrderNotifications(order, {
+      ...emailOnlyConfig,
+      resendApiKey: "",
+      notificationEmail: "",
+      telegramBotToken: "123456:telegram-test-token",
+      telegramChatId: "123456789",
+    });
+
+    expect(result).toEqual({ email: "not_configured", whatsapp: "not_configured", telegram: "sent" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.telegram.org/bot123456:telegram-test-token/sendMessage",
+      expect.objectContaining({ method: "POST", headers: { "Content-Type": "application/json" } }),
+    );
+    expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string)).toMatchObject({
+      chat_id: "123456789",
+      text: expect.stringContaining("New Cash on Delivery order — PA-TEST-01"),
+      disable_web_page_preview: true,
     });
   });
 });

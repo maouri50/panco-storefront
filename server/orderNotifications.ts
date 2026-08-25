@@ -21,11 +21,14 @@ export type NotificationConfig = {
   whatsappTemplateName: string;
   whatsappTemplateLanguage: string;
   metaGraphVersion: string;
+  telegramBotToken: string;
+  telegramChatId: string;
 };
 
 export type NotificationResult = {
   email: "sent" | "not_configured";
   whatsapp: "sent" | "not_configured";
+  telegram: "sent" | "not_configured";
 };
 
 const escapeHtml = (value: string) =>
@@ -42,6 +45,8 @@ export function getNotificationConfig(): NotificationConfig {
     whatsappTemplateName: process.env.META_WHATSAPP_TEMPLATE_NAME ?? "panco_cod_alert",
     whatsappTemplateLanguage: process.env.META_WHATSAPP_TEMPLATE_LANGUAGE ?? "en_US",
     metaGraphVersion: process.env.META_GRAPH_VERSION ?? "v23.0",
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
+    telegramChatId: process.env.TELEGRAM_OWNER_CHAT_ID ?? "",
   };
 }
 
@@ -70,6 +75,7 @@ export async function sendOrderNotifications(
   const summary = orderSummary(order);
   let email: NotificationResult["email"] = "not_configured";
   let whatsapp: NotificationResult["whatsapp"] = "not_configured";
+  let telegram: NotificationResult["telegram"] = "not_configured";
 
   if (config.resendApiKey && config.notificationEmail) {
     const emailResponse = await fetch("https://api.resend.com/emails", {
@@ -134,5 +140,23 @@ export async function sendOrderNotifications(
     whatsapp = "sent";
   }
 
-  return { email, whatsapp };
+  if (config.telegramBotToken && config.telegramChatId) {
+    const telegramResponse = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: config.telegramChatId,
+        text: summary,
+        disable_web_page_preview: true,
+      }),
+    });
+    const telegramPayload = await telegramResponse.json().catch(() => null) as { ok?: boolean } | null;
+
+    if (!telegramResponse.ok || !telegramPayload?.ok) {
+      throw new Error("The order email was sent, but the Telegram alert could not be sent. Please check the Panco Telegram bot token and owner chat ID.");
+    }
+    telegram = "sent";
+  }
+
+  return { email, whatsapp, telegram };
 }

@@ -11,11 +11,11 @@
 - [x] Compare email and WhatsApp notification options for Cash on Delivery orders.
 - [x] Confirm the Resend sender strategy and owner inbox for new Cash on Delivery orders.
 - [x] Create or connect the Resend API key and configure its server-side sender settings.
-- [ ] Set up the Meta WhatsApp Business account, business number, and permanent API credentials.
+- [x] Supersede the blocked Meta WhatsApp Business setup in favor of the user-approved Telegram alert route.
 - [x] Add secure server-side product-page order submission and owner notification delivery.
 - [x] Wire the Home checkout flow to the real Cash on Delivery submission procedure and remove its prototype-only order message.
 - [x] Test a complete Cash on Delivery order notification without storing live customer data during development.
-- [ ] Run a controlled WhatsApp notification test for a new Cash on Delivery order.
+- [x] Supersede the planned controlled WhatsApp test in favor of the user-approved Telegram alert test.
 - [x] Define the editable catalog fields and owner-only admin access rules.
 - [x] Create the catalog schema, database migration, and owner-only management procedures.
 - [x] Build the `/admin` interface for adding, editing, and removing catalog items.
@@ -69,10 +69,14 @@
 - [ ] Independently confirm the dedicated Resend account for saadyou50@gmail.com, beyond the user's external setup report.
 - [ ] Confirm the dedicated Panco Orders key scope and account-verification state, beyond the successful send result.
 - [x] Confirm the official Meta WhatsApp Business Cloud API setup path for Panco Cash on Delivery alerts.
-- [ ] Create and obtain approval for a Panco utility template that can deliver owner order alerts outside the 24-hour WhatsApp service window.
+- [x] Retire the Panco Meta utility-template work after moving to Telegram alerts at the user's request.
 - [x] Update the Panco WhatsApp notification helper to send the approved utility template rather than an unrestricted text message.
-- [ ] Securely configure the Meta access token, sending Phone Number ID, and owner WhatsApp recipient number.
-- [ ] Send one owner-approved controlled Cash on Delivery WhatsApp notification and confirm delivery.
+- [x] Retire Meta WhatsApp credential configuration after moving to Telegram alerts at the user's request.
+- [x] Retire the controlled Meta WhatsApp notification test after moving to Telegram alerts at the user's request.
+- [x] Add Telegram bot order-alert delivery while preserving the verified Panco email backup alerts.
+- [x] Validate the secure Panco Telegram bot token with Telegram’s getMe endpoint without exposing it.
+- [x] Securely configure and validate the Panco Telegram bot token and owner chat ID.
+- [x] Send one owner-approved controlled Cash on Delivery Telegram alert and confirm delivery.
 - [ ] Re-test owner sign-in and the protected Panco catalog desk once the Manus sign-in service is reachable.
 - [x] Add a scroll-triggered dark Cash on Delivery announcement strip above the Panco homepage navigation after the hero transition.
 - [x] Refine the homepage navigation to a compact pale bar beneath the announcement while retaining original Panco interactions and responsive controls.
