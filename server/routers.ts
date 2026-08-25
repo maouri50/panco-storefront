@@ -5,6 +5,7 @@ import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { sendOrderNotifications } from "./orderNotifications";
+import { sendContactNotifications } from "./contactNotifications";
 import { createCatalogItem, deleteCatalogItem, listCatalogItems, seedCatalogItems, updateCatalogItem } from "./catalogStore";
 import { initialCatalogItems } from "./catalogDefaults";
 import { createCashOnDeliveryReference } from "./orderReference";
@@ -76,6 +77,29 @@ export const appRouter = router({
             code: "INTERNAL_SERVER_ERROR",
             message: "We could not send your request. Please try again shortly.",
           });
+        }
+      }),
+  }),
+
+  contact: router({
+    submit: publicProcedure
+      .input(z.object({
+        customerName: z.string().trim().min(2).max(120),
+        email: z.string().trim().email().max(240),
+        topic: z.string().trim().min(2).max(120),
+        message: z.string().trim().min(8).max(3000),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const notifications = await sendContactNotifications(input);
+          if (notifications.email !== "sent" && notifications.telegram !== "sent") {
+            throw new TRPCError({ code: "PRECONDITION_FAILED", message: "The Panco contact desk is not configured yet. Please try again shortly." });
+          }
+          return { success: true };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          console.error("[Panco contact notification]", error);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "We could not send your message. Please try again shortly." });
         }
       }),
   }),

@@ -539,6 +539,37 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .catalog-card__link { display: block; width: 100%; height: 100%; }
 .mobile-product-ledger { display: none; }
 .product-page { min-height: 100vh; background: var(--shell); color: var(--ink); }
+.contact-page { min-height: 100vh; background: var(--shell); color: var(--ink); }
+.contact-page__bar { min-height: 33px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; padding: 0 4.8vw; background: var(--night); color: var(--shell); text-transform: uppercase; font-size: 7px; letter-spacing: .13em; }
+.contact-page__bar a { display: inline-flex; align-items: center; gap: 7px; width: max-content; opacity: .82; }
+.contact-page__bar > span:last-child { justify-self: end; opacity: .72; }
+.contact-page__nav { height: 86px; display: flex; align-items: center; justify-content: space-between; padding: 0 4.8vw; border-bottom: 1px solid var(--line); }
+.contact-page__brand { display: inline-flex; align-items: center; gap: 9px; font-family: "Playfair Display", Georgia, serif; font-size: 24px; letter-spacing: -.055em; }
+.contact-page__nav nav { display: flex; gap: 28px; }
+.contact-page__nav nav a { padding: 7px 0; text-transform: uppercase; font-size: 8px; letter-spacing: .14em; }
+.contact-page__main { display: grid; grid-template-columns: minmax(0, .92fr) minmax(420px, .78fr); gap: clamp(45px, 8vw, 150px); max-width: 1340px; margin: 0 auto; padding: clamp(72px, 10vw, 152px) 4.8vw; }
+.contact-page__intro h1 { max-width: 600px; margin: 0; font-family: "Playfair Display", Georgia, serif; font-size: clamp(62px, 7vw, 112px); font-weight: 400; line-height: .8; letter-spacing: -.07em; }
+.contact-page__intro > p:not(.detail-kicker) { max-width: 470px; margin: 30px 0 0; font-family: "Playfair Display", Georgia, serif; font-size: 23px; line-height: 1.18; color: var(--muted); }
+.contact-page__notes { display: grid; gap: 1px; max-width: 520px; margin-top: 46px; background: var(--line); }
+.contact-page__notes article { display: flex; gap: 15px; padding: 19px; background: var(--shell); }
+.contact-page__notes svg { flex: 0 0 auto; margin-top: 2px; }
+.contact-page__notes div { display: grid; gap: 6px; }
+.contact-page__notes b { text-transform: uppercase; font-size: 8px; letter-spacing: .13em; }
+.contact-page__notes span { color: var(--muted); font-family: "Playfair Display", Georgia, serif; font-size: 17px; line-height: 1.16; }
+.contact-page__form-card { align-self: start; padding: clamp(24px, 4vw, 43px); border: 1px solid rgba(29,29,27,.18); border-radius: 22px; background: #fff; box-shadow: 0 18px 36px rgba(18,18,18,.08); }
+.contact-page__form-card form { display: grid; gap: 16px; }
+.contact-page__form-title { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 6px; text-transform: uppercase; font-size: 9px; font-weight: 600; letter-spacing: .16em; }
+.contact-page__form-card label { display: grid; gap: 7px; text-transform: uppercase; font-size: 7px; font-weight: 600; letter-spacing: .12em; }
+.contact-page__form-card input, .contact-page__form-card select, .contact-page__form-card textarea { width: 100%; padding: 14px 15px; border: 1px solid rgba(29,29,27,.14); border-radius: 11px; background: #fff; outline: 0; color: var(--ink); font-family: "DM Mono", ui-monospace, monospace; font-size: 11px; }
+.contact-page__form-card textarea { resize: vertical; line-height: 1.5; }
+.contact-page__form-card button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 55px; margin-top: 4px; border: 0; border-radius: 14px; background: var(--order-confirm); color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: .16em; }
+.contact-page__form-card button:disabled { opacity: .65; }
+.contact-page__error { margin: 0; color: #9e2f28; font-size: 10px; line-height: 1.4; }
+.contact-page__success { display: grid; justify-items: center; gap: 17px; padding: 48px 12px; text-align: center; }
+.contact-page__success > span { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 50%; background: #e5f6eb; color: var(--order-confirm); }
+.contact-page__success h2 { margin: 0; font-family: "Playfair Display", Georgia, serif; font-size: 46px; font-weight: 400; letter-spacing: -.06em; }
+.contact-page__success p { max-width: 320px; margin: 0; color: var(--muted); font-family: "Playfair Display", Georgia, serif; font-size: 18px; line-height: 1.16; }
+.contact-page__success button { width: auto; min-height: auto; margin-top: 10px; padding: 0 0 7px; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); }
 .product-page__bar { min-height: 33px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; padding: 0 4.8vw; background: var(--night); color: var(--shell); text-transform: uppercase; font-size: 7px; letter-spacing: .13em; }
 .product-page__bar > span:last-child { justify-self: end; opacity: .72; }
 .product-page__back { display: inline-flex; align-items: center; gap: 7px; width: max-content; opacity: .8; transition: opacity .2s var(--ease-out); }
@@ -755,11 +786,25 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
   .product-detail__purchase { position: static; min-height: auto; padding: 63px 10vw 70px; border-top: 1px solid var(--line); border-left: 0; }
   .gallery-stage { min-height: 590px; }
 }
+@media (max-width: 860px) {
+  .contact-page__main { grid-template-columns: 1fr; gap: 45px; padding-top: 72px; }
+  .contact-page__form-card { max-width: 620px; width: 100%; }
+}
 @media (max-width: 680px) {
   .product-page__bar { grid-template-columns: 1fr auto; padding: 0 15px; font-size: 6px; }
   .product-page__bar > span:last-child { display: none; }
   .product-page__nav { height: 70px; padding: 0 17px; }
   .product-page__nav > div a { display: none; }
+  .contact-page__bar { grid-template-columns: 1fr auto; padding: 0 15px; font-size: 6px; }
+  .contact-page__bar > span:last-child { display: none; }
+  .contact-page__nav { height: 70px; padding: 0 17px; }
+  .contact-page__nav nav { gap: 16px; }
+  .contact-page__nav nav a { font-size: 7px; }
+  .contact-page__main { padding: 54px 17px 70px; }
+  .contact-page__intro h1 { font-size: 62px; }
+  .contact-page__intro > p:not(.detail-kicker) { font-size: 20px; }
+  .contact-page__notes { margin-top: 34px; }
+  .contact-page__form-card { padding: 22px 17px; border-radius: 18px; }
   .product-page__brand { gap: 6px; font-size: 18px; }
   .product-page__brand img { width: 23px; height: 23px; }
   .product-page__brand i { height: 18px; }

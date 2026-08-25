@@ -117,9 +117,9 @@
 - [x] Analyze the reference duffle-bag gallery image sizing, thumbnail interaction, and responsive behavior.
 - [x] Apply the resulting gallery sizing and navigation improvements to the original Panco product pages.
 - [x] Verify the refined original Panco gallery at desktop and mobile widths.
-- [ ] Analyze the reference contact-page layout and interaction pattern without copying its branding or text.
-- [ ] Create an original dedicated Panco contact route with clear customer inquiry details and form handling.
-- [ ] Verify the Panco contact route across desktop and mobile layouts.
+- [x] Analyze the reference contact-page layout and interaction pattern without copying its branding or text.
+- [x] Create an original dedicated Panco contact route with clear customer inquiry details and real owner-notification handling.
+- [x] Verify the Panco contact route across desktop and mobile layouts.
 - [x] Recompose Panco product pages into the requested desktop thumbnail rail, tall selected-image stage, and right-side product ledger.
 - [x] Align the simplified four-field Panco Cash on Delivery card beneath the right-side product ledger.
 - [x] Verify the recomposed Panco product page at desktop and mobile widths.
