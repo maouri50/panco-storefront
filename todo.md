@@ -45,3 +45,11 @@
 - [x] Select French from the language menu and verify its saved state persists across navigation and reload.
 - [x] Verify English is the default locale for a first-time visitor without a saved preference.
 - [x] Preserve manual English, French, and Arabic choices from the top language selector after selection.
+- [x] Map all customer-facing, multilingual, metadata, and admin references to the North Atelier name.
+- [ ] Rename the public storefront, product pages, metadata, and admin text to Interpanco.
+- [ ] Verify Interpanco branding across English, French, and Arabic routes.
+- [x] Locate and tighten the multiline collection-heading spacing so its second line sits closer to the first.
+- [x] Verify the refined collection heading at desktop and mobile widths.
+- [x] Confirm the compact collection-heading CSS adjustment is present and visually matches the requested close two-line treatment.
+- [x] Explicitly inspect the tightened collection heading in desktop and mobile views and confirm its second line has the requested compact placement.
+- [x] Obtain an independent visual review confirming the compact two-line collection-heading treatment on desktop and mobile.
