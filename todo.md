@@ -32,3 +32,8 @@
 - [x] Deliver the revised project checkpoint and editing guidance.
 - [x] Restore the pre-sale product-page checkpoint to remove the sale color treatment and full sale-layout redesign.
 - [x] Verify the restored product page no longer includes the two reverted sale-layout changes.
+- [x] Map the current language-selector controls and Arabic translation scope.
+- [x] Add a persistent Arabic locale selection with right-to-left page direction.
+- [x] Translate the public storefront and primary product-detail content into Arabic.
+- [x] Verify Arabic selection, browser persistence, and mobile/desktop right-to-left layout.
+- [x] Verify the Arabic storefront and product-detail pages at desktop width for readable right-to-left alignment.

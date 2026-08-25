@@ -372,6 +372,81 @@ h2 em { font-weight: 400; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 
+/* Arabic locale — persistent RTL layout and Arabic-first typography. */
+html[lang="ar"] body { font-family: "Noto Kufi Arabic", "DM Mono", sans-serif; }
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] .hero-content h1,
+html[lang="ar"] .product-detail__title h1,
+html[lang="ar"] .mobile-product-ledger h1 { font-family: "Noto Naskh Arabic", Georgia, serif; letter-spacing: 0; line-height: 1.18; }
+html[dir="rtl"] .utility-bar,
+html[dir="rtl"] .top-nav,
+html[dir="rtl"] .product-page__bar,
+html[dir="rtl"] .product-page__nav,
+html[dir="rtl"] .footer__base,
+html[dir="rtl"] .product-footer__base { direction: rtl; }
+html[dir="rtl"] .utility-bar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+html[dir="rtl"] .utility-locale { justify-self: end; }
+html[dir="rtl"] .utility-side { justify-self: start; }
+html[dir="rtl"] .locale-menu { left: auto; right: 20px; text-align: right; }
+html[dir="rtl"] .locale-menu button { text-align: right; }
+html[dir="rtl"] .hero-content,
+html[dir="rtl"] .hero-content--left,
+html[dir="rtl"] .hero-content--right,
+html[dir="rtl"] .section-heading,
+html[dir="rtl"] .collections-intro,
+html[dir="rtl"] .craft-section__copy,
+html[dir="rtl"] .small-things-copy,
+html[dir="rtl"] .journal-article,
+html[dir="rtl"] .newsletter-section,
+html[dir="rtl"] .faq-intro,
+html[dir="rtl"] .footer__intro { text-align: right; }
+html[dir="rtl"] .hero-content { align-items: flex-start; }
+html[dir="rtl"] .top-nav__side--left { justify-content: flex-end; }
+html[dir="rtl"] .top-nav__side--right { justify-content: flex-start; }
+html[dir="rtl"] .desktop-nav { flex-direction: row-reverse; }
+html[dir="rtl"] .product-detail__purchase,
+html[dir="rtl"] .mobile-product-ledger,
+html[dir="rtl"] .product-reviews,
+html[dir="rtl"] .related-section,
+html[dir="rtl"] .product-footer { text-align: right; }
+html[dir="rtl"] .product-detail__gallery { direction: rtl; }
+html[dir="rtl"] .gallery-thumbs { order: 2; }
+html[dir="rtl"] .gallery-stage { order: 1; }
+html[dir="rtl"] .gallery-grid { grid-column: 1 / -1; }
+html[dir="rtl"] .breadcrumb,
+html[dir="rtl"] .product-detail__availability,
+html[dir="rtl"] .purchase-controls,
+html[dir="rtl"] .detail-quantity,
+html[dir="rtl"] .cod-card > div,
+html[dir="rtl"] .product-highlights li,
+html[dir="rtl"] .direct-order-product,
+html[dir="rtl"] .detail-bag-modal__summary { flex-direction: row-reverse; }
+html[dir="rtl"] .variant-field,
+html[dir="rtl"] .direct-order-fields label,
+html[dir="rtl"] .newsletter-form label,
+html[dir="rtl"] .product-footer__newsletter { text-align: right; }
+html[dir="rtl"] input { text-align: right; }
+html[dir="rtl"] .detail-accordion button { text-align: right; }
+html[dir="rtl"] .detail-accordion button svg { margin-right: auto; margin-left: 0; }
+html[dir="rtl"] .related-section__head,
+html[dir="rtl"] .related-grid,
+html[dir="rtl"] .product-footer__links { direction: rtl; }
+html[dir="rtl"] .product-page__back svg,
+html[dir="rtl"] .hero-cta svg,
+html[dir="rtl"] .underlined-link svg,
+html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
+
+@media (max-width: 680px) {
+  html[dir="rtl"] .top-nav__side--left { justify-content: flex-start; }
+  html[dir="rtl"] .top-nav__side--right { justify-content: flex-end; }
+  html[dir="rtl"] .product-page__bar { grid-template-columns: 1fr; text-align: right; }
+  html[dir="rtl"] .product-page__bar > span { display: none; }
+  html[dir="rtl"] .product-page__back { justify-content: flex-start; }
+  html[dir="rtl"] .gallery-thumbs { order: initial; }
+}
+
 /* Catalog administration — private owner ledger. */
 .admin-shell { min-height: 100vh; padding: 0 4.8vw 80px; background: var(--shell); color: var(--ink); }
 .admin-state { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; max-width: none; min-height: 100vh; padding-left: max(7vw, 34px); }
