@@ -24,6 +24,9 @@
 - [x] Rebuild the product gallery, purchase controls, delivery card, and information hierarchy around the supplied mobile reference.
 - [x] Refine the product notes, related-items, and footer modules to match the reference’s mobile reading rhythm without fabricating customer content.
 - [x] Verify the redesigned product page on mobile and desktop.
+- [x] Define the editable olive, blush-stone, and delivery-green product-page accent tokens.
+- [x] Apply the sale and Cash on Delivery color treatment to product status, variants, order form, and confirmation action.
+- [x] Verify the revised product-page colors on mobile and desktop.
 - [x] Confirm the reference-inspired charcoal, stone-grey, and warm off-white palette direction.
 - [x] Replace the current accent system with the approved neutral palette across the storefront and product pages.
 - [x] Verify the neutral palette has readable contrast and consistent responsive behavior on desktop and mobile.
