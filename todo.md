@@ -68,6 +68,13 @@
 - [x] Connect the intended Resend account before resuming Panco Cash on Delivery email notifications.
 - [ ] Independently confirm the dedicated Resend account for saadyou50@gmail.com, beyond the user's external setup report.
 - [ ] Confirm the dedicated Panco Orders key scope and account-verification state, beyond the successful send result.
+- [ ] Confirm the official Meta WhatsApp Business Cloud API setup path for Panco Cash on Delivery alerts.
+- [ ] Securely configure the Meta access token, sending Phone Number ID, and owner WhatsApp recipient number.
+- [ ] Send one owner-approved controlled Cash on Delivery WhatsApp notification and confirm delivery.
+- [ ] Re-test owner sign-in and the protected Panco catalog desk once the Manus sign-in service is reachable.
+- [x] Add a scroll-triggered dark Cash on Delivery announcement strip above the Panco homepage navigation after the hero transition.
+- [x] Refine the homepage navigation to a compact pale bar beneath the announcement while retaining original Panco interactions and responsive controls.
+- [x] Verify the homepage header transition at desktop and mobile breakpoints.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

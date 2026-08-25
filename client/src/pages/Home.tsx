@@ -28,6 +28,7 @@ import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 import { useLocale } from "@/contexts/LocaleContext";
 import { homeCopy, localizeProduct } from "@/lib/localization";
 import { trpc } from "@/lib/trpc";
+import { getHeaderTransitionThreshold } from "@/lib/headerTransition";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
@@ -103,10 +104,14 @@ export default function Home() {
   const localizedProducts = products.map((product) => localizeProduct(product, locale));
   const isArabic = locale === "ar";
   const isFrench = locale === "fr";
+  const cashOnDeliveryLabel = isArabic
+    ? "الدفع عند الاستلام متاح"
+    : isFrench
+      ? "Paiement à la livraison disponible"
+      : "Cash on Delivery available";
   const localizedCollections = isArabic ? arabicCollections : isFrench ? frenchCollections : collections;
   const localizedFaqItems = isArabic ? arabicFaqItems : isFrench ? frenchFaqItems : faqItems;
   const [activeSlide, setActiveSlide] = useState(0);
-  const [promoIndex, setPromoIndex] = useState(0);
   const [cartCount, setCartCount] = useState(0);
   const [cartItem, setCartItem] = useState<Product | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -123,16 +128,20 @@ export default function Home() {
 
   useEffect(() => {
     const slideTimer = window.setInterval(() => setActiveSlide((current) => (current + 1) % heroSlides.length), 6200);
-    const promoTimer = window.setInterval(() => setPromoIndex((current) => (current + 1) % copy.promo.length), 3400);
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      const heroHeight = document.getElementById("hero")?.offsetHeight ?? window.innerHeight;
+      const isDirectShopLink = window.location.hash === "#shop";
+      setScrolled(isDirectShopLink || window.scrollY >= getHeaderTransitionThreshold(heroHeight, window.innerHeight));
+    };
     onScroll();
+    const initialPositionFrame = window.requestAnimationFrame(onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.clearInterval(slideTimer);
-      window.clearInterval(promoTimer);
+      window.cancelAnimationFrame(initialPositionFrame);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [copy.promo.length]);
+  }, []);
 
   const addToCart = (product: Product) => {
     setCartItem(product);
@@ -172,7 +181,7 @@ export default function Home() {
 
   return (
     <div className="storefront" dir={direction}>
-      <div className="utility-bar">
+      <div className={`utility-bar ${scrolled ? "utility-bar--visible" : ""}`}>
         <button type="button" className="utility-locale" onClick={() => setLocaleOpen((value) => !value)}>
           <Globe2 size={13} /> {copy.locale} <ChevronDown size={12} />
         </button>
@@ -183,7 +192,7 @@ export default function Home() {
             <button type="button" className={locale === "ar" ? "is-active" : ""} onClick={() => { setLocale("ar"); setLocaleOpen(false); }}>العربية <small>المغرب والشرق الأوسط</small></button>
           </div>
         )}
-        <span className="utility-message" key={promoIndex}>{copy.promo[promoIndex]}</span>
+        <span className="utility-message">{cashOnDeliveryLabel}</span>
         <span className="utility-side">Panco / Since 2024</span>
       </div>
 
@@ -210,7 +219,7 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="hero-carousel" aria-label="Featured Panco campaign">
+        <section id="hero" className="hero-carousel" aria-label="Featured Panco campaign">
           <img src={slide.image} alt="Panco collection" className="hero-carousel__image" key={slide.image} />
           <div className="hero-carousel__wash" />
           <div className="hero-house-stamp" aria-hidden="true"><span className="brand-monogram brand-monogram--light">P</span><div><span>Panco</span><small>Objects / studio ledger</small></div></div>
