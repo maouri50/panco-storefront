@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { sendOrderNotifications, type CashOnDeliveryOrder, type NotificationConfig } from "./orderNotifications";
+import { orderTotal, sendOrderNotifications, type CashOnDeliveryOrder, type NotificationConfig } from "./orderNotifications";
 
 const order: CashOnDeliveryOrder = {
   orderReference: "PA-TEST-01",
   productName: "Atlas Card Wallet",
   productPrice: "$78",
+  productImageUrl: "https://images.panco.example/atlas-card-wallet.jpg",
   color: "Oxblood",
   quantity: 1,
   customerName: "Test Customer",
@@ -28,6 +29,10 @@ const emailOnlyConfig: NotificationConfig = {
 };
 
 describe("sendOrderNotifications", () => {
+  it("calculates the visible order total from the actual price and quantity", () => {
+    expect(orderTotal({ productPrice: "$78", quantity: 2 })).toBe("$156");
+  });
+
   it("sends a structured Resend email and leaves Telegram and WhatsApp inactive without credentials", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "email-1" }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -40,10 +45,14 @@ describe("sendOrderNotifications", () => {
       "https://api.resend.com/emails",
       expect.objectContaining({ method: "POST", headers: expect.objectContaining({ Authorization: "Bearer resend-test-key" }) }),
     );
-    expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string)).toMatchObject({
+    const body = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string);
+    expect(body).toMatchObject({
       to: ["owner@example.com"],
       subject: "New COD order PA-TEST-01 — Atlas Card Wallet",
     });
+    expect(body.html).toContain('src="https://images.panco.example/atlas-card-wallet.jpg"');
+    expect(body.html).toContain("Order total");
+    expect(body.html).toContain("$78");
   });
 
   it("sends an approved Panco utility template when Meta WhatsApp credentials are configured", async () => {
@@ -89,7 +98,7 @@ describe("sendOrderNotifications", () => {
     });
   });
 
-  it("sends a Panco Cash on Delivery summary to the configured Telegram owner chat", async () => {
+  it("sends the purchased Panco product photo and structured Cash on Delivery details to Telegram", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true, result: { message_id: 101 } }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -103,13 +112,14 @@ describe("sendOrderNotifications", () => {
 
     expect(result).toEqual({ email: "not_configured", whatsapp: "not_configured", telegram: "sent" });
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.telegram.org/bot123456:telegram-test-token/sendMessage",
+      "https://api.telegram.org/bot123456:telegram-test-token/sendPhoto",
       expect.objectContaining({ method: "POST", headers: { "Content-Type": "application/json" } }),
     );
     expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string)).toMatchObject({
       chat_id: "123456789",
-      text: expect.stringContaining("New Cash on Delivery order — PA-TEST-01"),
-      disable_web_page_preview: true,
+      photo: "https://images.panco.example/atlas-card-wallet.jpg",
+      caption: expect.stringContaining("New Cash on Delivery order — PA-TEST-01"),
     });
+    expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string).caption).toContain("Order total: $78");
   });
 });

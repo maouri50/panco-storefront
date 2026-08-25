@@ -167,6 +167,7 @@ export default function Home() {
     submitCashOnDelivery.mutate({
       productName: cartItem.name,
       productPrice: cartItem.price,
+      productImageUrl: new URL(cartItem.image, window.location.origin).toString(),
       color: cartItem.colors[0]?.name ?? "Standard",
       quantity: Math.min(Math.max(cartCount, 1), 9),
       customerName: String(form.get("customerName") ?? ""),

@@ -12,6 +12,7 @@ describe("Panco controlled Telegram delivery", () => {
         orderReference: "PA-TELEGRAM-TEST",
         productName: "Telegram alert validation — not a customer order",
         productPrice: "N/A",
+        productImageUrl: "https://placehold.co/1200x1200/png?text=Panco+test",
         color: "Test only",
         quantity: 0,
         customerName: "Panco notification check",

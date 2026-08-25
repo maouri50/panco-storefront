@@ -46,6 +46,7 @@ export const appRouter = router({
         z.object({
           productName: z.string().min(1).max(120),
           productPrice: z.string().min(1).max(32),
+          productImageUrl: z.string().url().max(2000),
           color: z.string().min(1).max(80),
           quantity: z.number().int().min(1).max(9),
           customerName: z.string().trim().min(2).max(120),

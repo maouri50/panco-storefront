@@ -93,6 +93,16 @@
 - [ ] Create a Vercel project from the private Panco GitHub repository without exposing credentials.
 - [ ] Configure required server and notification environment variables in Vercel’s secure settings.
 - [ ] Verify the Vercel storefront and tRPC API deployment.
+- [ ] Compare affordable domain registrars, including first-year and renewal terms, for the Panco custom domain.
+- [ ] Guide the user through a secure domain purchase and the Vercel DNS connection without collecting registrar credentials.
+- [ ] Verify the selected custom domain routes to the Panco Vercel deployment after DNS propagation.
+- [x] Include the actual purchased product image, name, variant, quantity, price, total, order reference, and delivery details in Panco Cash on Delivery email alerts.
+- [x] Send the actual purchased product image and structured purchase details in Panco Telegram Cash on Delivery alerts.
+- [x] Verify the enhanced Panco email and Telegram order-alert templates with a controlled test.
+- [x] Rebuild the Panco product gallery with the requested large image proportion, thumbnail navigation, and image-based color selection.
+- [x] Place the Panco Cash on Delivery form adjacent to the selected product image on desktop while preserving a clear mobile flow.
+- [x] Add a Panco post-order thank-you view with the real purchased product image, order reference, customer name, totals, and delivery details.
+- [x] Verify the completed-order view after an owner-approved, non-customer browser form test.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
