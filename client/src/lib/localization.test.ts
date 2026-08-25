@@ -3,8 +3,11 @@ import { normalizeLocale } from "@/contexts/LocaleContext";
 import { localizeProduct } from "@/lib/localization";
 import { catalogProducts } from "@/lib/catalog";
 
-describe("Arabic locale helpers", () => {
-  it("defaults unsupported stored locales to English", () => {
+describe("Locale helpers", () => {
+  it("defaults missing or unsupported stored locales to English", () => {
+    expect(normalizeLocale(null)).toBe("en");
+    expect(normalizeLocale("de")).toBe("en");
+    expect(normalizeLocale("en")).toBe("en");
     expect(normalizeLocale("ar")).toBe("ar");
     expect(normalizeLocale("fr")).toBe("fr");
   });

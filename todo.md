@@ -43,3 +43,5 @@
 - [x] Verify French selection, browser persistence, and mobile/desktop layout.
 - [x] Translate the remaining French product-detail footer, secondary navigation, and support copy.
 - [x] Select French from the language menu and verify its saved state persists across navigation and reload.
+- [x] Verify English is the default locale for a first-time visitor without a saved preference.
+- [x] Preserve manual English, French, and Arabic choices from the top language selector after selection.
