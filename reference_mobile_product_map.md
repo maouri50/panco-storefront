@@ -47,3 +47,9 @@ North Atelier will preserve its own studio statement, locale selector, and origi
 The lower footer adds a compact social group, a large single-purpose newsletter invitation, a rounded email field with a circular action, a concise privacy line, and a final low-contrast copyright rule.
 
 North Atelier will retain its existing newsletter form and original links, but restyle the mobile footer to use this more focused single-column cadence and clear visual close.
+
+## Sale-layout purchase pattern
+
+The supplied sale reference replaces a conventional product ledger with a storefront-like purchase system: an olive delivery notice; a pale blush icon header; a direct availability line; image-backed color cards; and a large, rounded **Easy Order** card. The card presents two compact personal-information fields, full-width address and city fields, and a single prominent green confirmation action. The page uses generous vertical breathing room, rounded input outlines, and dark technical uppercase labels.
+
+North Atelier will translate this as an original purchase module with its existing catalog variants, own product imagery, and secure Cash on Delivery procedure. The outcome will not copy the reference brand mark, exact text, or external customer content.

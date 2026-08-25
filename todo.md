@@ -27,6 +27,18 @@
 - [x] Define the editable olive, blush-stone, and delivery-green product-page accent tokens.
 - [x] Apply the sale and Cash on Delivery color treatment to product status, variants, order form, and confirmation action.
 - [x] Verify the revised product-page colors on mobile and desktop.
+- [x] Map the supplied full sale-layout purchase structure into original product-page components.
+- [x] Rebuild the mobile sale-style header, image-backed color cards, and rounded Easy Order form.
+- [x] Align desktop purchase behavior with the sale-style hierarchy while preserving the original product gallery.
+- [x] Verify the complete sale-layout product flow on mobile and desktop.
+- [x] Interactively verify sale-layout variants, quantity/add-to-bag, and Cash on Delivery form behavior after the rebuild.
+- [x] Verify quantity changes carry into the bag and Cash on Delivery purchase path.
+- [ ] Verify Cash on Delivery form validation and one post-submit response state without sending an unintended live customer notification.
+- [x] Confirm quantity changes carry into the bag and the empty Cash on Delivery form blocks incomplete orders through required-field validation.
+- [x] Wire the sale-style product menu and search controls to real product-page interactions.
+- [x] Refine the desktop sale-layout composition so the gallery and purchase ledger use the full canvas intentionally.
+- [x] Restart the development service and synchronize the preview with the latest shared project version.
+- [x] Confirm the synchronized preview is available and report its version.
 - [x] Confirm the reference-inspired charcoal, stone-grey, and warm off-white palette direction.
 - [x] Replace the current accent system with the approved neutral palette across the storefront and product pages.
 - [x] Verify the neutral palette has readable contrast and consistent responsive behavior on desktop and mobile.
