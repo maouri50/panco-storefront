@@ -18,6 +18,8 @@ export type NotificationConfig = {
   metaAccessToken: string;
   metaPhoneNumberId: string;
   whatsappDestination: string;
+  whatsappTemplateName: string;
+  whatsappTemplateLanguage: string;
   metaGraphVersion: string;
 };
 
@@ -37,6 +39,8 @@ export function getNotificationConfig(): NotificationConfig {
     metaAccessToken: process.env.META_WHATSAPP_ACCESS_TOKEN ?? "",
     metaPhoneNumberId: process.env.META_WHATSAPP_PHONE_NUMBER_ID ?? "",
     whatsappDestination: process.env.META_WHATSAPP_OWNER_NUMBER ?? "",
+    whatsappTemplateName: process.env.META_WHATSAPP_TEMPLATE_NAME ?? "panco_cod_alert",
+    whatsappTemplateLanguage: process.env.META_WHATSAPP_TEMPLATE_LANGUAGE ?? "en_US",
     metaGraphVersion: process.env.META_GRAPH_VERSION ?? "v23.0",
   };
 }
@@ -89,7 +93,7 @@ export async function sendOrderNotifications(
     email = "sent";
   }
 
-  if (config.metaAccessToken && config.metaPhoneNumberId && config.whatsappDestination) {
+  if (config.metaAccessToken && config.metaPhoneNumberId && config.whatsappDestination && config.whatsappTemplateName) {
     const whatsappResponse = await fetch(
       `https://graph.facebook.com/${config.metaGraphVersion}/${config.metaPhoneNumberId}/messages`,
       {
@@ -102,14 +106,30 @@ export async function sendOrderNotifications(
           messaging_product: "whatsapp",
           recipient_type: "individual",
           to: config.whatsappDestination,
-          type: "text",
-          text: { body: summary },
+          type: "template",
+          template: {
+            name: config.whatsappTemplateName,
+            language: { code: config.whatsappTemplateLanguage },
+            components: [
+              {
+                type: "body",
+                parameters: [
+                  { type: "text", text: order.orderReference },
+                  { type: "text", text: order.productName },
+                  { type: "text", text: String(order.quantity) },
+                  { type: "text", text: order.customerName },
+                  { type: "text", text: order.phone },
+                  { type: "text", text: `${order.address}, ${order.city}` },
+                ],
+              },
+            ],
+          },
         }),
       },
     );
 
     if (!whatsappResponse.ok) {
-      throw new Error("The order email was sent, but the WhatsApp alert could not be sent. Please check the Meta WhatsApp settings.");
+      throw new Error("The order email was sent, but the WhatsApp alert could not be sent. Please check the Meta settings and approved Panco utility template.");
     }
     whatsapp = "sent";
   }

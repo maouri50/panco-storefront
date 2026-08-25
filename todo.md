@@ -68,7 +68,9 @@
 - [x] Connect the intended Resend account before resuming Panco Cash on Delivery email notifications.
 - [ ] Independently confirm the dedicated Resend account for saadyou50@gmail.com, beyond the user's external setup report.
 - [ ] Confirm the dedicated Panco Orders key scope and account-verification state, beyond the successful send result.
-- [ ] Confirm the official Meta WhatsApp Business Cloud API setup path for Panco Cash on Delivery alerts.
+- [x] Confirm the official Meta WhatsApp Business Cloud API setup path for Panco Cash on Delivery alerts.
+- [ ] Create and obtain approval for a Panco utility template that can deliver owner order alerts outside the 24-hour WhatsApp service window.
+- [x] Update the Panco WhatsApp notification helper to send the approved utility template rather than an unrestricted text message.
 - [ ] Securely configure the Meta access token, sending Phone Number ID, and owner WhatsApp recipient number.
 - [ ] Send one owner-approved controlled Cash on Delivery WhatsApp notification and confirm delivery.
 - [ ] Re-test owner sign-in and the protected Panco catalog desk once the Manus sign-in service is reachable.
