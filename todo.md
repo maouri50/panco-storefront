@@ -8,4 +8,16 @@
 - [x] Add editable product-detail data, a dedicated route, and product-card navigation.
 - [x] Build the original product-detail experience with gallery, variants, delivery details, and related products.
 - [x] Confirm desktop and mobile rendering and test the primary interactive controls.
+- [x] Compare email and WhatsApp notification options for Cash on Delivery orders.
+- [x] Confirm the Resend sender strategy and owner inbox for new Cash on Delivery orders.
+- [ ] Create or connect the Resend API key and configure its server-side sender settings.
+- [ ] Set up the Meta WhatsApp Business account, business number, and permanent API credentials.
+- [ ] Add secure server-side order submission and owner notification delivery.
+- [ ] Test a complete Cash on Delivery order notification without storing live customer data during development.
+- [ ] Run a controlled WhatsApp notification test for a new Cash on Delivery order.
+- [x] Confirm the reference-inspired charcoal, stone-grey, and warm off-white palette direction.
+- [x] Replace the current accent system with the approved neutral palette across the storefront and product pages.
+- [x] Verify the neutral palette has readable contrast and consistent responsive behavior on desktop and mobile.
+- [x] Restore the development server after the reported outage and confirm the storefront responds.
+- [x] Verify the recovered storefront loads successfully in the browser after restart.
 - [ ] Deliver the revised project checkpoint and editing guidance.
