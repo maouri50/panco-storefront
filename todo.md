@@ -83,6 +83,11 @@
 - [x] Verify the homepage header transition at desktop and mobile breakpoints.
 - [x] Keep the English Panco shop heading “Objects for the everyday.” on one line while preserving localized heading layouts.
 - [x] Verify the one-line English shop heading at desktop and mobile widths.
+- [ ] Trace and fix the homepage tRPC request that receives an HTML document instead of JSON.
+- [ ] Verify the Panco homepage loads without tRPC JSON parsing errors in the browser console.
+- [ ] Audit the complete Panco project export for secrets and generated files before pushing to GitHub.
+- [ ] Create a private GitHub repository and push the complete Panco website source.
+- [ ] Verify the GitHub repository contains the complete source and provide the repository link.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
