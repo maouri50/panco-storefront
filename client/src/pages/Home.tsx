@@ -242,7 +242,7 @@ export default function Home() {
           <div className="section-heading">
             <div>
               <p className="kicker">{copy.newArrivals}</p>
-              <h2>{copy.everyday.split("\n").map((line, index) => index === 1 ? <em key={line}>{line}</em> : <span key={line}>{line}<br /></span>)}</h2>
+              {locale === "en" ? <h2 className="shop-heading--single-line">{copy.everyday}</h2> : <h2>{copy.everyday.split("\n").map((line, index) => index === 1 ? <em key={line}>{line}</em> : <span key={line}>{line}<br /></span>)}</h2>}
             </div>
             <a href="#collections" className="underlined-link">{copy.collections} <ArrowRight size={15} /></a>
           </div>

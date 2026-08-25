@@ -77,6 +77,8 @@
 - [x] Add a scroll-triggered dark Cash on Delivery announcement strip above the Panco homepage navigation after the hero transition.
 - [x] Refine the homepage navigation to a compact pale bar beneath the announcement while retaining original Panco interactions and responsive controls.
 - [x] Verify the homepage header transition at desktop and mobile breakpoints.
+- [x] Keep the English Panco shop heading “Objects for the everyday.” on one line while preserving localized heading layouts.
+- [x] Verify the one-line English shop heading at desktop and mobile widths.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

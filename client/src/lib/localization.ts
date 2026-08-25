@@ -73,7 +73,7 @@ export const homeCopy = {
       { eyebrow: "Made by hand", title: "The evidence\nof care.", note: "Each edge is burnished, every seam considered, and nothing rushed.", cta: "Meet the makers" },
     ],
     newArrivals: "New arrivals",
-    everyday: "Objects for\nthe everyday.",
+    everyday: "Objects for the everyday.",
     collections: "See all collections",
     quickAdd: "Quick add",
     stayConnected: "Stay connected",
