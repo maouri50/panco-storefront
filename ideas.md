@@ -72,3 +72,9 @@ Use a custom `N/A` wordmark with compressed high-contrast serif letterforms, pai
 - Product imagery must not show third-party logos or recognizable outside branding; every object must read as part of the North Atelier house catalog.
 - The `N/A` wordmark and north-notch symbol are the primary brand signature: they appear prominently in the first viewport, in the global header, and as recurring framing details.
 - Commerce remains folio-like rather than template-like: numbered references, thin rules, material annotations, and deliberately offset objects make product information feel collected and editorial.
+
+## Revision: Coastal Ledger
+
+The current storefront update is a deliberately more reference-aligned retail framework. It preserves North Atelier’s original materials and brand but swaps the earlier warm green direction for an editable **inset blue, shell, ember, and cloud** system. The active experience prioritizes a centered house mark, utility bar, campaign carousel, horizontal product rail, collection tiles, a detailed product ledger, and a clearly signposted Cash on Delivery path. On product pages, imagery sits beside a purchase column that combines color variants, quantities, Cash on Delivery, studio detail accordions, and related objects.
+
+The active palette is deliberate: **Inset Blue** is the dominant dark field, **Shell** is the primary paper canvas, **Cloud** is reserved for service-led ledger moments such as Cash on Delivery, and **Ember** appears only as a small material or selected-state cue. The north-notch and `N/A` wordmark are the recurring house signature: visible in every first viewport, repeated in product ledgers, and carried through the footer.
