@@ -95,7 +95,7 @@
 - [ ] Create a Vercel project from the private Panco GitHub repository without exposing credentials.
 - [ ] Configure required server and notification environment variables in Vercel’s secure settings.
 - [ ] Verify the Vercel storefront and tRPC API deployment.
-- [ ] Compare affordable domain registrars, including first-year and renewal terms, for the Panco custom domain.
+- [x] Compare affordable domain registrars, including first-year and renewal terms, for the Panco custom domain.
 - [ ] Guide the user through a secure domain purchase and the Vercel DNS connection without collecting registrar credentials.
 - [ ] Verify the selected custom domain routes to the Panco Vercel deployment after DNS propagation.
 - [x] Include the actual purchased product image, name, variant, quantity, price, total, order reference, and delivery details in Panco Cash on Delivery email alerts.
@@ -140,6 +140,10 @@
 - [x] Integrate confirmed final original editorial assets across Atlas, Morrow Tote, and Rook Field Bag galleries.
 - [x] Confirm the newly wired Atlas, Morrow Tote, and Rook Field Bag editorial hero URLs return final `image/*` content after redirects.
 - [x] Record explicit desktop and mobile per-product gallery evidence for Atlas, Morrow Tote, Rook Field Bag, and Long Mile Duffle after final asset resolution.
+- [x] Fix the Panco mobile completed-order summary overflow so it no longer covers confirmation, status, or delivery details.
+- [x] Verify the Panco completed-order page at phone and desktop widths with product summary, status, and shipping cards fully readable.
+- [x] Add a development-only completed-order preview state for non-notifying responsive verification.
+- [x] Record explicit phone and desktop inspection evidence for the completed-order confirmation, status, shipping cards, and order summary layout.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

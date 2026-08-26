@@ -864,4 +864,27 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
   .direct-order-modal > div { padding: 44px 23px 26px; }
   .direct-order-fields { grid-template-columns: 1fr; }
   .direct-order-fields .full-row { grid-column: auto; }
+
+  /* Completed order: force a single safe flow so the desktop summary cannot overlap on phones. */
+  .product-page--complete { overflow-x: hidden; }
+  .panco-order-success { display: flex; flex-direction: column; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 25px 16px 56px; gap: 18px; }
+  .panco-order-success__main, .panco-order-summary { width: 100%; min-width: 0; border-radius: 18px; }
+  .panco-order-success__main { order: 1; padding: 25px 18px; }
+  .panco-order-summary { order: 2; align-self: stretch; overflow: hidden; }
+  .panco-order-success h1 { max-width: none; margin-top: 20px; font-size: clamp(38px, 11vw, 48px); line-height: .92; overflow-wrap: anywhere; }
+  .panco-order-success__intro { max-width: none; font-size: 18px; }
+  .panco-order-status { margin-top: 30px; }
+  .panco-order-status > div { gap: 7px; }
+  .panco-order-status span { min-width: 0; font-size: 6px; overflow-wrap: anywhere; }
+  .panco-order-success__details { grid-template-columns: 1fr; gap: 10px; margin-top: 24px; }
+  .panco-order-success__details article { min-width: 0; padding: 16px; }
+  .panco-order-success__details b { font-size: 18px; overflow-wrap: anywhere; }
+  .panco-order-summary h2 { padding: 20px; font-size: 32px; }
+  .panco-order-summary__item { grid-template-columns: 64px minmax(0, 1fr); gap: 13px; padding: 20px; }
+  .panco-order-summary__item img { width: 64px; height: 64px; }
+  .panco-order-summary__item div { min-width: 0; }
+  .panco-order-summary__item b, .panco-order-summary__item span { overflow-wrap: anywhere; }
+  .panco-order-summary__item strong { grid-column: 2; justify-self: start; font-size: 24px; }
+  .panco-order-summary dl { padding: 0 20px 20px; }
+  .panco-order-summary dl div { gap: 12px; }
 }

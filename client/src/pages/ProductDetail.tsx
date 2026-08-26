@@ -64,7 +64,22 @@ export default function ProductDetail() {
   const [bagOpen, setBagOpen] = useState(false);
   const [directOrderOpen, setDirectOrderOpen] = useState(true);
   const [requestSent, setRequestSent] = useState(false);
-  const [completedOrder, setCompletedOrder] = useState<CompletedOrder | null>(null);
+  const [completedOrder, setCompletedOrder] = useState<CompletedOrder | null>(() => {
+    const hasPreviewFlag = import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("orderPreview") === "1";
+    if (!hasPreviewFlag) return null;
+    return {
+      orderReference: "PA-PREVIEW",
+      productName: product.name,
+      productPrice: product.price,
+      productImageUrl: product.image,
+      color: product.colors[0]?.name ?? "Studio selection",
+      quantity: 1,
+      customerName: "Panco preview",
+      phone: "+212 600 000 000",
+      address: "Studio preview",
+      city: "Marrakech",
+    };
+  });
   const [openDetail, setOpenDetail] = useState<number | null>(0);
   const submitCashOnDelivery = trpc.orders.submitCashOnDelivery.useMutation({
     onSuccess: (result, variables) => {
