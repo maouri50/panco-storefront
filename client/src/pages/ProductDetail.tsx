@@ -12,6 +12,7 @@ import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 import { useLocale } from "@/contexts/LocaleContext";
 import { localizeProduct, productCopy } from "@/lib/localization";
 import { hasCompleteCodOrderFields } from "@/lib/codOrderForm";
+import { PancoLogo } from "@/components/PancoLogo";
 import "@/productDetailResponsive.css";
 
 const detailItems = [
@@ -122,7 +123,7 @@ export default function ProductDetail() {
   if (completedOrder) {
     return <div className="product-page product-page--complete" dir={direction}>
       <div className="product-page__bar"><Link href="/" className="product-page__back"><ArrowLeft size={14} /> {copy.back}</Link><span>{copy.available}</span><span>{copy.ledger}</span></div>
-      <header className="product-page__nav"><Link href="/" className="product-page__brand"><span className="brand-monogram" aria-hidden="true">P</span><span>Panco</span></Link><div><Link href="/#shop">{isArabic ? "المتجر" : isFrench ? "Boutique" : "Shop"}</Link><Link href="/#story">{isArabic ? "الاستوديو" : isFrench ? "Atelier" : "Studio"}</Link><Link href="/contact">{isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"}</Link><button type="button" onClick={() => setBagOpen(true)}><ShoppingBag size={19} /></button></div></header>
+      <header className="product-page__nav"><Link href="/" className="product-page__brand"><PancoLogo variant="dark" /></Link><div><Link href="/#shop">{isArabic ? "المتجر" : isFrench ? "Boutique" : "Shop"}</Link><Link href="/#story">{isArabic ? "الاستوديو" : isFrench ? "Atelier" : "Studio"}</Link><Link href="/contact">{isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"}</Link><button type="button" onClick={() => setBagOpen(true)}><ShoppingBag size={19} /></button></div></header>
       <main className="panco-order-success">
         <section className="panco-order-success__main">
           <div className="panco-order-success__reference"><span><Check size={18} /></span><p>{successCopy.reference} #{completedOrder.orderReference}</p></div>
@@ -140,7 +141,7 @@ export default function ProductDetail() {
   return (
     <div className="product-page" dir={direction}>
       <div className="product-page__bar"><Link href="/" className="product-page__back"><ArrowLeft size={14} /> {copy.back}</Link><span>{copy.available}</span><span>{copy.ledger}</span></div>
-      <header className="product-page__nav"><Link href="/" className="product-page__brand"><span className="brand-monogram" aria-hidden="true">P</span><span>Panco</span></Link><div><Link href="/#shop">{isArabic ? "المتجر" : isFrench ? "Boutique" : "Shop"}</Link><Link href="/#story">{isArabic ? "الاستوديو" : isFrench ? "Atelier" : "Studio"}</Link><Link href="/contact">{isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"}</Link><button type="button" onClick={() => setBagOpen(true)}><ShoppingBag size={19} /> {bagOpen ? "" : quantity}</button></div></header>
+      <header className="product-page__nav"><Link href="/" className="product-page__brand"><PancoLogo variant="dark" /></Link><div><Link href="/#shop">{isArabic ? "المتجر" : isFrench ? "Boutique" : "Shop"}</Link><Link href="/#story">{isArabic ? "الاستوديو" : isFrench ? "Atelier" : "Studio"}</Link><Link href="/contact">{isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"}</Link><button type="button" onClick={() => setBagOpen(true)}><ShoppingBag size={19} /> {bagOpen ? "" : quantity}</button></div></header>
 
       <section className="mobile-product-ledger"><div className="mobile-product-ledger__row"><p>{product.category} / {isArabic ? "بانكو" : "Panco"}</p><span>{locale === "ar" ? "رقم القطعة" : "Object no."} {String(products.findIndex(item => item.slug === product.slug) + 1).padStart(2, "0")}</span></div><div><h1>{product.name}</h1><div><b>{product.price}</b>{product.was && <del>{product.was}</del>}<small>{copy.available}</small></div></div></section>
 
