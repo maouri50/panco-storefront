@@ -150,6 +150,10 @@
 - [x] Record explicit desktop and mobile visual evidence for the Panco vector logo system.
 - [x] Rename the Panco product feedback section from Customer Notes to Reviews without adding fabricated reviews or ratings.
 - [x] Record explicit desktop and mobile visual evidence for the honest Panco Reviews empty state.
+- [x] Recompose the Panco homepage hero into the requested full-bleed editorial layout with centered brand mark and compact left navigation.
+- [x] Refine the Panco hero headline, utility controls, carousel indicators, and caption treatment while retaining original brand copy and assets.
+- [x] Verify the recomposed Panco homepage hero at desktop and mobile widths.
+- [x] Record explicit desktop and mobile inspection evidence for the recomposed Panco homepage hero composition.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

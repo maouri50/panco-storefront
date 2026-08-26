@@ -34,7 +34,7 @@ import { PancoLogo } from "@/components/PancoLogo";
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
   {
-    image: "/manus-storage/north-atelier-hero_6fac9d50.jpg",
+    image: "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
     align: "hero-content--left",
   },
   {
