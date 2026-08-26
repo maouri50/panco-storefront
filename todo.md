@@ -126,6 +126,20 @@
 - [x] Confirm the generated Atlas gallery image URLs have resolved to final product photography rather than temporary or failed placeholders.
 - [x] Re-verify the resolved Atlas gallery thumbnail rail and selected stage image at desktop and mobile widths.
 - [x] Record explicit desktop and mobile evidence that the Atlas gallery uses completed product photography with no generating or failed placeholder.
+- [x] Define an original Panco editorial product-photo shot list with full-product, alternate-angle, and close-detail views.
+- [x] Generate and retain the successful original Panco Long Mile Duffle editorial hero without copying reference products, branding, or imagery.
+- [x] Integrate the verified Duffle editorial hero with stable fallback gallery images across the Panco product thumbnails.
+- [x] Verify the final active Panco product gallery image set at desktop and mobile widths before delivery.
+- [x] Add automated coverage confirming every Panco catalog item has the expected original editorial gallery sequence.
+- [x] Remove all failed Panco editorial image URLs from customer-facing gallery positions and restore stable fallbacks immediately.
+- [x] Retain stable gallery fallback images rather than expose failed editorial alternate-angle generations to customers.
+- [x] Verify the restored Panco Long Mile Duffle gallery thumbnail rail, selected image, and color cards are free of generating or failed placeholders.
+- [x] Record concrete HTTP asset checks for every restored Long Mile Duffle gallery and color-card image.
+- [x] Re-check all customer-facing Panco product galleries for generating or failed placeholders and record per-product results.
+- [x] Generate completed replacement editorial full-product images for Atlas, Morrow Tote, and Rook Field Bag, retaining only final successful assets.
+- [x] Integrate confirmed final original editorial assets across Atlas, Morrow Tote, and Rook Field Bag galleries.
+- [x] Confirm the newly wired Atlas, Morrow Tote, and Rook Field Bag editorial hero URLs return final `image/*` content after redirects.
+- [x] Record explicit desktop and mobile per-product gallery evidence for Atlas, Morrow Tote, Rook Field Bag, and Long Mile Duffle after final asset resolution.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
