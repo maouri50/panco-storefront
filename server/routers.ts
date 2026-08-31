@@ -9,6 +9,7 @@ import { sendContactNotifications } from "./contactNotifications";
 import { createCatalogItem, deleteCatalogItem, listCatalogItems, seedCatalogItems, updateCatalogItem } from "./catalogStore";
 import { initialCatalogItems } from "./catalogDefaults";
 import { createCashOnDeliveryReference } from "./orderReference";
+import { getAnnouncementConfig, saveAnnouncementConfig } from "./announcementStore";
 
 const catalogInput = z.object({
   slug: z.string().trim().min(2).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and hyphens only."),
@@ -25,6 +26,15 @@ const catalogInput = z.object({
   highlights: z.array(z.string().trim().min(1).max(240)).min(1).max(12),
   published: z.boolean(),
   displayOrder: z.number().int().min(0).max(9999),
+});
+
+const announcementInput = z.object({
+  enabled: z.boolean(),
+  messages: z.array(z.string().trim().min(1).max(120)).min(1).max(12),
+  backgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  textColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  fontStyle: z.enum(["mono", "serif", "sans"]),
+  rotationSeconds: z.number().int().min(2).max(20),
 });
 
 export const appRouter = router({
@@ -102,6 +112,11 @@ export const appRouter = router({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "We could not send your message. Please try again shortly." });
         }
       }),
+  }),
+
+  announcements: router({
+    publicConfig: publicProcedure.query(() => getAnnouncementConfig()),
+    update: adminProcedure.input(announcementInput).mutation(({ input }) => saveAnnouncementConfig(input)),
   }),
 
   catalog: router({

@@ -3,7 +3,7 @@
  * a reference-inspired retail rhythm built from shell paper, inset blue, ember accents,
  * centered house mark, oversized campaign imagery, and crisp mono retail annotations.
  */
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -23,26 +23,27 @@ import {
   Truck,
   X,
 } from "lucide-react";
-import { type Product } from "@/lib/catalog";
+import { pancoAssetUrl, type Product } from "@/lib/catalog";
 import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 import { useLocale } from "@/contexts/LocaleContext";
 import { homeCopy, localizeProduct } from "@/lib/localization";
 import { trpc } from "@/lib/trpc";
 import { getHeaderTransitionThreshold } from "@/lib/headerTransition";
 import { PancoLogo } from "@/components/PancoLogo";
+import { nextAnnouncementIndex } from "@/lib/announcementRotation";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
   {
-    image: "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
+    image: pancoAssetUrl("/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg"),
     align: "hero-content--left",
   },
   {
-    image: "/manus-storage/north-atelier-tote_a6b855c4.jpg",
+    image: pancoAssetUrl("/manus-storage/north-atelier-tote_a6b855c4.jpg"),
     align: "hero-content--right",
   },
   {
-    image: "/manus-storage/north-atelier-workshop_151c4843.jpg",
+    image: pancoAssetUrl("/manus-storage/north-atelier-workshop_151c4843.jpg"),
     align: "hero-content--left",
   },
 ];
@@ -123,6 +124,9 @@ export default function Home() {
   const [localeOpen, setLocaleOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [scrolled, setScrolled] = useState(false);
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const announcementQuery = trpc.announcements.publicConfig.useQuery(undefined, { retry: false });
+  const announcement = announcementQuery.data;
   const submitCashOnDelivery = trpc.orders.submitCashOnDelivery.useMutation({
     onSuccess: () => setOrderSubmitted(true),
   });
@@ -143,6 +147,18 @@ export default function Home() {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (!announcement || announcement.messages.length <= 1) {
+      setAnnouncementIndex(0);
+      return;
+    }
+    setAnnouncementIndex(0);
+    const interval = window.setInterval(() => {
+      setAnnouncementIndex(current => nextAnnouncementIndex(current, announcement.messages.length));
+    }, announcement.rotationSeconds * 1000);
+    return () => window.clearInterval(interval);
+  }, [announcement]);
 
   const addToCart = (product: Product) => {
     setCartItem(product);
@@ -183,7 +199,11 @@ export default function Home() {
 
   return (
     <div className="storefront" dir={direction}>
-      <div className={`utility-bar ${scrolled ? "utility-bar--visible" : ""}`}>
+      <div
+        className={`utility-bar ${scrolled ? "utility-bar--visible" : ""} ${announcement?.enabled === false ? "utility-bar--disabled" : ""}`}
+        data-font={announcement?.fontStyle ?? "mono"}
+        style={{ "--announcement-bg": announcement?.backgroundColor ?? "#18362a", "--announcement-text": announcement?.textColor ?? "#f6f5f2" } as CSSProperties}
+      >
         <button type="button" className="utility-locale" onClick={() => setLocaleOpen((value) => !value)}>
           <Globe2 size={13} /> {copy.locale} <ChevronDown size={12} />
         </button>
@@ -194,7 +214,7 @@ export default function Home() {
             <button type="button" className={locale === "ar" ? "is-active" : ""} onClick={() => { setLocale("ar"); setLocaleOpen(false); }}>العربية <small>المغرب والشرق الأوسط</small></button>
           </div>
         )}
-        <span className="utility-message">{cashOnDeliveryLabel}</span>
+        <span className="utility-message" key={announcementIndex}>{announcement?.messages?.[announcementIndex] ?? cashOnDeliveryLabel}</span>
         <span className="utility-side">Panco / Since 2024</span>
       </div>
 

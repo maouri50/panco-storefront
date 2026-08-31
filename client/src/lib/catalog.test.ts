@@ -9,11 +9,11 @@ describe("Panco editorial catalog galleries", () => {
       expect(product.image).toBe(product.gallery[0]);
       expect(product.gallery).toHaveLength(3);
       expect(new Set(product.gallery).size).toBe(3);
-      expect(product.gallery.every((image) => image.startsWith("/manus-storage/"))).toBe(true);
+      expect(product.gallery.every((image) => image.startsWith("https://northshop-zgmh8cdf.manus.space/manus-storage/"))).toBe(true);
     }
 
     expect(catalogProducts.find((product) => product.slug === "long-mile-duffle")?.gallery[0]).toBe(
-      "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
+      "https://northshop-zgmh8cdf.manus.space/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
     );
   });
 });

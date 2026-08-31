@@ -8,6 +8,13 @@
       "when": 1787636391068,
       "tag": "0000_thin_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787961782463,
+      "tag": "0001_swift_slyde",
+      "breakpoints": true
     }
   ]
 }
