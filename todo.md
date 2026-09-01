@@ -187,6 +187,12 @@
 - [ ] Guide creation or connection of the independent Panco MySQL database and secure session configuration through official provider pages.
 - [ ] Add the resulting production runtime settings in Vercel and redeploy the correct Panco project.
 - [ ] Verify one approved production Cash on Delivery request delivers the product-specific email and Telegram alerts successfully.
+- [ ] Inspect the Resend delivery result and sender configuration for the confirmed Panco Vercel email-notification failure.
+- [ ] Correct the secure Resend sender or runtime configuration without changing the working Telegram alert path.
+- [ ] Run one approved email-only Panco delivery test and confirm receipt in the owner inbox.
+- [x] Confirm that the Panco Vercel email request is delivered by Resend but placed in Gmail Spam due to the shared onboarding sender.
+- [x] Add and verify a branded Panco sending domain in Resend using DNS records at the temporary domain provider.
+- [ ] Set `ORDER_NOTIFICATION_FROM` in Vercel to the verified branded Panco sender and run an approved inbox-placement test.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
@@ -203,3 +209,8 @@
 - [x] Confirm the compact collection-heading CSS adjustment is present and visually matches the requested close two-line treatment.
 - [x] Explicitly inspect the tightened collection heading in desktop and mobile views and confirm its second line has the requested compact placement.
 - [x] Obtain an independent visual review confirming the compact two-line collection-heading treatment on desktop and mobile.
+- [x] Add the approved Resend DKIM, sending MX, sending SPF, and monitoring-only DMARC records to the typeitaliano.com Vercel DNS zone without altering routing records.
+- [x] Confirm Resend marks typeitaliano.com verified and sending-enabled after DNS propagation.
+- [ ] Configure the verified Panco sender in Vercel and perform one separately approved email-only inbox-placement test.
+- [x] Investigate the owner-reported non-receipt of a Resend-delivered branded Panco order email without sending another notification.
+- [x] Confirm that a branded Panco sender email is visible in the saadyou50@gmail.com Inbox after switching from the different Gmail account initially open in the browser.
