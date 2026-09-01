@@ -15,5 +15,8 @@ describe("Panco editorial catalog galleries", () => {
     expect(catalogProducts.find((product) => product.slug === "long-mile-duffle")?.gallery[0]).toBe(
       "https://northshop-zgmh8cdf.manus.space/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
     );
+    expect(catalogProducts.find((product) => product.slug === "atlas-card-wallet")?.gallery[0]).toBe(
+      "https://northshop-zgmh8cdf.manus.space/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
+    );
   });
 });

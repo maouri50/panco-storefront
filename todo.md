@@ -177,6 +177,9 @@
 - [ ] Guide secure Vercel entry of Panco database, session, email, and Telegram settings without exposing values in chat.
 - [ ] Redeploy the correct Panco GitHub branch on Vercel after all required runtime settings are configured.
 - [x] Prepare a self-service Panco Vercel deployment guide with official sources for every required production credential.
+- [x] Analyze the Sahara Wallet product page’s gallery sizing, purchase layout, and responsive interaction for original Panco adaptation.
+- [x] Refine original Panco product pages using the validated Sahara Wallet layout principles without copying source branding, copy, or imagery.
+- [x] Verify the refined Panco product flow on desktop and mobile before synchronizing the update to GitHub.
 - [ ] Guide temporary typeitaliano.com connection to the Panco Vercel project without collecting registrar credentials.
 - [ ] Verify the user-managed Vercel deployment after the temporary domain is connected.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.

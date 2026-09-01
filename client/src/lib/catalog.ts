@@ -23,11 +23,11 @@ const rawCatalogProducts: Product[] = [
     category: "Small leather goods",
     price: "$78",
     was: "$92",
-    image: "/manus-storage/panco-atlas-wallet-editorial-final_26f31ab6.jpg",
+    image: "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
     gallery: [
-      "/manus-storage/panco-atlas-wallet-editorial-final_26f31ab6.jpg",
       "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
       "/manus-storage/panco-atlas-wallet-interior_26a2cff9.jpg",
+      "/manus-storage/panco-atlas-wallet-editorial-final_26f31ab6.jpg",
     ],
     swatches: ["#66363f", "#352a2a"],
     colors: [
