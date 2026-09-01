@@ -173,6 +173,12 @@
 - [x] Replace Manus-host-only product image paths with portable production image URLs that work on Vercel.
 - [ ] Configure the required Panco server runtime values in Vercel without exposing any credentials.
 - [ ] Verify Panco product photos and Telegram order alerts on the corrected Vercel deployment before delivery.
+- [ ] Document the required Panco Vercel production environment variables and safe sources for each value.
+- [ ] Guide secure Vercel entry of Panco database, session, email, and Telegram settings without exposing values in chat.
+- [ ] Redeploy the correct Panco GitHub branch on Vercel after all required runtime settings are configured.
+- [x] Prepare a self-service Panco Vercel deployment guide with official sources for every required production credential.
+- [ ] Guide temporary typeitaliano.com connection to the Panco Vercel project without collecting registrar credentials.
+- [ ] Verify the user-managed Vercel deployment after the temporary domain is connected.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
