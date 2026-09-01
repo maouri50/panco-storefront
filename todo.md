@@ -182,6 +182,11 @@
 - [x] Verify the refined Panco product flow on desktop and mobile before synchronizing the update to GitHub.
 - [ ] Guide temporary typeitaliano.com connection to the Panco Vercel project without collecting registrar credentials.
 - [ ] Verify the user-managed Vercel deployment after the temporary domain is connected.
+- [x] Inspect the correct panco-storefront Vercel deployment and identify the server-side cause of the production Cash on Delivery failure.
+- [x] Replace the unbundled Vercel API entrypoint with a self-contained function build so local tRPC server modules ship to production.
+- [ ] Guide creation or connection of the independent Panco MySQL database and secure session configuration through official provider pages.
+- [ ] Add the resulting production runtime settings in Vercel and redeploy the correct Panco project.
+- [ ] Verify one approved production Cash on Delivery request delivers the product-specific email and Telegram alerts successfully.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.
