@@ -14,9 +14,7 @@ export type Product = {
   highlights: string[];
 };
 
-export const pancoAssetUrl = (path: string) => path.startsWith("/manus-storage/") ? `https://northshop-zgmh8cdf.manus.space${path}` : path;
-
-const rawCatalogProducts: Product[] = [
+export const catalogProducts: Product[] = [
   {
     slug: "atlas-card-wallet",
     name: "Atlas Card Wallet",
@@ -98,13 +96,6 @@ const rawCatalogProducts: Product[] = [
     highlights: ["Wide zip opening", "Removable shoulder strap", "Reinforced leather base", "Cabin-ready proportions"],
   },
 ];
-
-export const catalogProducts: Product[] = rawCatalogProducts.map(product => ({
-  ...product,
-  image: pancoAssetUrl(product.image),
-  gallery: product.gallery.map(pancoAssetUrl),
-  colors: product.colors.map(color => ({ ...color, image: pancoAssetUrl(color.image) })),
-}));
 
 export function getProduct(slug: string) {
   return catalogProducts.find((product) => product.slug === slug);

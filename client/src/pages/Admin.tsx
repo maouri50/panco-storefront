@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Check, ChevronRight, ClipboardList, LogOut, PackagePlus, Pencil, Plus, Save, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 
 type AdminForm = {
@@ -39,10 +39,6 @@ type ManagedCatalogItem = {
   published: boolean;
   displayOrder: number;
 };
-
-type AnnouncementForm = { enabled: boolean; messages: string[]; backgroundColor: string; textColor: string; fontStyle: "mono" | "serif" | "sans"; rotationSeconds: number };
-
-const defaultAnnouncementForm: AnnouncementForm = { enabled: true, messages: ["Cash on Delivery available", "Hand-finished leather goods", "Panco / measured objects"], backgroundColor: "#18362a", textColor: "#f6f5f2", fontStyle: "mono", rotationSeconds: 4 };
 
 const blankForm = (displayOrder = 1): AdminForm => ({
   slug: "",
@@ -86,11 +82,9 @@ export default function Admin() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const isAdmin = user?.role === "admin";
   const catalogQuery = trpc.catalog.adminList.useQuery(undefined, { enabled: isAdmin, retry: false });
-  const announcementQuery = trpc.announcements.publicConfig.useQuery();
   const [form, setForm] = useState<AdminForm>(blankForm());
   const [creatingFirst, setCreatingFirst] = useState(false);
   const [notice, setNotice] = useState("");
-  const [announcementForm, setAnnouncementForm] = useState<AnnouncementForm>(defaultAnnouncementForm);
   const utils = trpc.useUtils();
 
   const refresh = async () => utils.catalog.adminList.invalidate();
@@ -98,9 +92,6 @@ export default function Admin() {
   const updateItem = trpc.catalog.update.useMutation({ onSuccess: async item => { await refresh(); setForm(formFromItem(item)); setNotice("Catalog changes saved."); } });
   const removeItem = trpc.catalog.remove.useMutation({ onSuccess: async () => { await refresh(); setForm(blankForm()); setNotice("Object removed from the catalog."); } });
   const importCatalog = trpc.catalog.importCurrentCatalog.useMutation({ onSuccess: async items => { await refresh(); if (items[0]) setForm(formFromItem(items[0])); setCreatingFirst(false); setNotice("Current studio catalog imported. You can now edit each object."); } });
-  const saveAnnouncement = trpc.announcements.update.useMutation({ onSuccess: config => { setAnnouncementForm(config); setNotice("Announcement bar saved."); } });
-
-  useEffect(() => { if (announcementQuery.data) setAnnouncementForm(announcementQuery.data); }, [announcementQuery.data]);
 
   const items = catalogQuery.data ?? [];
   const setField = <K extends keyof AdminForm>(field: K, value: AdminForm[K]) => setForm(current => ({ ...current, [field]: value }));
@@ -146,14 +137,12 @@ export default function Admin() {
   if (catalogQuery.isLoading) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>Opening the<br /><em>object ledger.</em></h1></main>;
   if (catalogQuery.error) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>The ledger<br /><em>is unavailable.</em></h1><p>{catalogQuery.error.message}</p><button type="button" className="admin-primary" onClick={() => catalogQuery.refetch()}>Try again <ChevronRight size={16} /></button></main>;
 
-  const saving = createItem.isPending || updateItem.isPending || removeItem.isPending || importCatalog.isPending || saveAnnouncement.isPending;
-  const mutationError = createItem.error ?? updateItem.error ?? removeItem.error ?? importCatalog.error ?? saveAnnouncement.error;
+  const saving = createItem.isPending || updateItem.isPending || removeItem.isPending || importCatalog.isPending;
+  const mutationError = createItem.error ?? updateItem.error ?? removeItem.error ?? importCatalog.error;
 
   return <main className="admin-shell">
     <header className="admin-header"><Link href="/" className="admin-brand"><span>P</span> Panco</Link><div><p>Catalog desk / owner access</p><button type="button" onClick={() => logout()} aria-label="Sign out"><LogOut size={16} /></button></div></header>
     <section className="admin-intro"><div><p className="admin-eyebrow">Private catalog desk</p><h1>Objects,<br /><em>under your hand.</em></h1><p>Add new products, correct details, change order, and control whether an item is visible in the storefront.</p></div><div className="admin-intro__meta"><span><ClipboardList size={17} /> {items.length} managed items</span><span><Check size={17} /> Owner-only access</span></div></section>
-
-    <section className="admin-announcement"><div><p className="admin-eyebrow">Announcement bar</p><h2>Messages in<br /><em>motion.</em></h2><p>These messages rotate in the green strip above the storefront navigation. Add one message or as many as you need.</p></div><form onSubmit={event => { event.preventDefault(); saveAnnouncement.mutate({ ...announcementForm, messages: announcementForm.messages.map(message => message.trim()).filter(Boolean) }); }}><label className="admin-toggle">Show announcement bar<span><input type="checkbox" checked={announcementForm.enabled} onChange={event => setAnnouncementForm(current => ({ ...current, enabled: event.target.checked }))} /> Visible to customers</span></label><div className="admin-announcement__appearance"><label>Bar color<input type="color" value={announcementForm.backgroundColor} onChange={event => setAnnouncementForm(current => ({ ...current, backgroundColor: event.target.value }))} /></label><label>Text color<input type="color" value={announcementForm.textColor} onChange={event => setAnnouncementForm(current => ({ ...current, textColor: event.target.value }))} /></label><label>Font<select value={announcementForm.fontStyle} onChange={event => setAnnouncementForm(current => ({ ...current, fontStyle: event.target.value as AnnouncementForm["fontStyle"] }))}><option value="mono">Studio mono</option><option value="serif">Editorial serif</option><option value="sans">Clean sans</option></select></label><label>Change every (seconds)<input type="number" min="2" max="20" value={announcementForm.rotationSeconds} onChange={event => setAnnouncementForm(current => ({ ...current, rotationSeconds: Number(event.target.value) || 4 }))} /></label></div><div className="admin-announcement__messages">{announcementForm.messages.map((message, index) => <div key={index}><input aria-label={`Announcement message ${index + 1}`} value={message} onChange={event => setAnnouncementForm(current => ({ ...current, messages: current.messages.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))} placeholder="Announcement message" /><button type="button" disabled={announcementForm.messages.length === 1} onClick={() => setAnnouncementForm(current => ({ ...current, messages: current.messages.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</button></div>)}</div><div className="admin-announcement__actions"><button type="button" className="admin-secondary" disabled={announcementForm.messages.length >= 12} onClick={() => setAnnouncementForm(current => ({ ...current, messages: [...current.messages, ""] }))}><Plus size={15} /> Add message</button><button className="admin-primary" type="submit" disabled={saving}>{saveAnnouncement.isPending ? "Saving…" : "Save announcement bar"} <Save size={15} /></button></div></form></section>
 
     {items.length === 0 && !creatingFirst ? <section className="admin-import"><div><PackagePlus size={27} /><h2>Start your catalog<br />your way.</h2><p>Import the original studio edit as a starting point, or create your first item from scratch.</p></div><div className="admin-import__actions"><button className="admin-secondary" type="button" disabled={saving} onClick={() => { setCreatingFirst(true); setForm(blankForm(1)); setNotice(""); }}>Create first item <Plus size={16} /></button><button className="admin-primary" type="button" disabled={saving} onClick={() => importCatalog.mutate()}>{saving ? "Importing…" : "Import current catalog"} <ChevronRight size={16} /></button></div></section> : <section className="admin-workspace">
       {items.length > 0 && <aside className="admin-list"><div className="admin-list__head"><p>Catalog items</p><button type="button" onClick={() => { setCreatingFirst(false); setForm(blankForm(Math.max(0, ...items.map(item => item.displayOrder)) + 1)); setNotice(""); }}><Plus size={15} /> New object</button></div><div className="admin-list__items">{items.map(item => <button type="button" key={item.id} className={form.id === item.id ? "is-selected" : ""} onClick={() => { setCreatingFirst(false); setForm(formFromItem(item)); setNotice(""); }}><img src={item.image} alt="" /><span><b>{item.name}</b><small>{item.published ? "Published" : "Draft"} / {item.category}</small></span><Pencil size={14} /></button>)}</div></aside>}
