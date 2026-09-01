@@ -51,3 +51,16 @@ export const catalogItems = mysqlTable(
 
 export type CatalogItem = typeof catalogItems.$inferSelect;
 export type InsertCatalogItem = typeof catalogItems.$inferInsert;
+
+export const announcementSettings = mysqlTable("announcement_settings", {
+  id: int("id").primaryKey(),
+  enabled: boolean("enabled").notNull().default(true),
+  messagesJson: text("messagesJson").notNull(),
+  backgroundColor: varchar("backgroundColor", { length: 24 }).notNull().default("#18362a"),
+  textColor: varchar("textColor", { length: 24 }).notNull().default("#f6f5f2"),
+  fontStyle: varchar("fontStyle", { length: 24 }).notNull().default("mono"),
+  rotationSeconds: int("rotationSeconds").notNull().default(4),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnnouncementSettings = typeof announcementSettings.$inferSelect;

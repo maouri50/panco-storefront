@@ -144,6 +144,35 @@
 - [x] Verify the Panco completed-order page at phone and desktop widths with product summary, status, and shipping cards fully readable.
 - [x] Add a development-only completed-order preview state for non-notifying responsive verification.
 - [x] Record explicit phone and desktop inspection evidence for the completed-order confirmation, status, shipping cards, and order summary layout.
+- [x] Define an original Panco logo system with primary wordmark, P monogram, and light/dark application variants.
+- [x] Implement an original hand-coded Panco vector logo system without copying existing brand marks.
+- [x] Integrate the selected Panco vector logo across the storefront header, product pages, favicon, and footer.
+- [x] Record explicit desktop and mobile visual evidence for the Panco vector logo system.
+- [x] Rename the Panco product feedback section from Customer Notes to Reviews without adding fabricated reviews or ratings.
+- [x] Record explicit desktop and mobile visual evidence for the honest Panco Reviews empty state.
+- [x] Recompose the Panco homepage hero into the requested full-bleed editorial layout with centered brand mark and compact left navigation.
+- [x] Refine the Panco hero headline, utility controls, carousel indicators, and caption treatment while retaining original brand copy and assets.
+- [x] Verify the recomposed Panco homepage hero at desktop and mobile widths.
+- [x] Record explicit desktop and mobile inspection evidence for the recomposed Panco homepage hero composition.
+- [ ] Select and provision an independent production database for the Panco Vercel runtime.
+- [ ] Configure independent Vercel OAuth/session settings for Panco owner authentication.
+- [ ] Securely configure Panco Resend and Telegram order-alert credentials in Vercel.
+- [ ] Configure the required Vercel production environment variables and apply the production database schema.
+- [ ] Deploy and verify the complete Panco storefront, catalog API, admin access, and Cash on Delivery alerts on Vercel.
+- [x] Add an original Panco mobile delivery strip and refine the full-bleed homepage hero framing with a centered brand area and strong collection CTA.
+- [x] Refine the mobile Panco new-arrivals section into a clear horizontal product rail with compact pricing and swatch details.
+- [x] Verify the refined Panco homepage flow at mobile and desktop widths.
+- [x] Record explicit phone and desktop evidence for the Panco delivery strip, hero framing, centered brand area, CTA, and horizontal new-arrivals rail.
+- [x] Restore the Panco announcement-bar placement while keeping its current green color treatment.
+- [x] Add a persisted owner-only Panco announcement-bar editor with editable colors, font style, rotation speed, and up to twelve messages.
+- [x] Rotate configured Panco announcement messages automatically without layout shifts.
+- [x] Add database migration, secure admin procedures, and unit coverage for announcement-bar configuration.
+- [ ] Verify the public Panco announcement bar on desktop/mobile and the owner editor after owner sign-in is available.
+- [ ] Synchronize the complete announcement-bar update to GitHub and trigger the Vercel deployment.
+- [x] Diagnose the broken Manus-host-only Panco image URL base and missing Vercel notification runtime configuration.
+- [x] Replace Manus-host-only product image paths with portable production image URLs that work on Vercel.
+- [ ] Configure the required Panco server runtime values in Vercel without exposing any credentials.
+- [ ] Verify Panco product photos and Telegram order alerts on the corrected Vercel deployment before delivery.
 - [x] Validate the Resend API key from the dedicated saadyou50@gmail.com account through secure server-side configuration.
 - [x] Send one controlled Panco Cash on Delivery test notification after the dedicated key is validated.
 - [x] Map the current Interpanco references and replace them with the confirmed Panco brand name.

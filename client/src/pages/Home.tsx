@@ -3,7 +3,7 @@
  * a reference-inspired retail rhythm built from shell paper, inset blue, ember accents,
  * centered house mark, oversized campaign imagery, and crisp mono retail annotations.
  */
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -23,25 +23,27 @@ import {
   Truck,
   X,
 } from "lucide-react";
-import { type Product } from "@/lib/catalog";
+import { pancoAssetUrl, type Product } from "@/lib/catalog";
 import { useManagedCatalog } from "@/hooks/useManagedCatalog";
 import { useLocale } from "@/contexts/LocaleContext";
 import { homeCopy, localizeProduct } from "@/lib/localization";
 import { trpc } from "@/lib/trpc";
 import { getHeaderTransitionThreshold } from "@/lib/headerTransition";
+import { PancoLogo } from "@/components/PancoLogo";
+import { nextAnnouncementIndex } from "@/lib/announcementRotation";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
   {
-    image: "/manus-storage/north-atelier-hero_6fac9d50.jpg",
+    image: pancoAssetUrl("/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg"),
     align: "hero-content--left",
   },
   {
-    image: "/manus-storage/north-atelier-tote_a6b855c4.jpg",
+    image: pancoAssetUrl("/manus-storage/north-atelier-tote_a6b855c4.jpg"),
     align: "hero-content--right",
   },
   {
-    image: "/manus-storage/north-atelier-workshop_151c4843.jpg",
+    image: pancoAssetUrl("/manus-storage/north-atelier-workshop_151c4843.jpg"),
     align: "hero-content--left",
   },
 ];
@@ -122,6 +124,9 @@ export default function Home() {
   const [localeOpen, setLocaleOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [scrolled, setScrolled] = useState(false);
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const announcementQuery = trpc.announcements.publicConfig.useQuery(undefined, { retry: false });
+  const announcement = announcementQuery.data;
   const submitCashOnDelivery = trpc.orders.submitCashOnDelivery.useMutation({
     onSuccess: () => setOrderSubmitted(true),
   });
@@ -142,6 +147,18 @@ export default function Home() {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (!announcement || announcement.messages.length <= 1) {
+      setAnnouncementIndex(0);
+      return;
+    }
+    setAnnouncementIndex(0);
+    const interval = window.setInterval(() => {
+      setAnnouncementIndex(current => nextAnnouncementIndex(current, announcement.messages.length));
+    }, announcement.rotationSeconds * 1000);
+    return () => window.clearInterval(interval);
+  }, [announcement]);
 
   const addToCart = (product: Product) => {
     setCartItem(product);
@@ -182,7 +199,11 @@ export default function Home() {
 
   return (
     <div className="storefront" dir={direction}>
-      <div className={`utility-bar ${scrolled ? "utility-bar--visible" : ""}`}>
+      <div
+        className={`utility-bar ${scrolled ? "utility-bar--visible" : ""} ${announcement?.enabled === false ? "utility-bar--disabled" : ""}`}
+        data-font={announcement?.fontStyle ?? "mono"}
+        style={{ "--announcement-bg": announcement?.backgroundColor ?? "#18362a", "--announcement-text": announcement?.textColor ?? "#f6f5f2" } as CSSProperties}
+      >
         <button type="button" className="utility-locale" onClick={() => setLocaleOpen((value) => !value)}>
           <Globe2 size={13} /> {copy.locale} <ChevronDown size={12} />
         </button>
@@ -193,7 +214,7 @@ export default function Home() {
             <button type="button" className={locale === "ar" ? "is-active" : ""} onClick={() => { setLocale("ar"); setLocaleOpen(false); }}>العربية <small>المغرب والشرق الأوسط</small></button>
           </div>
         )}
-        <span className="utility-message">{cashOnDeliveryLabel}</span>
+        <span className="utility-message" key={announcementIndex}>{announcement?.messages?.[announcementIndex] ?? cashOnDeliveryLabel}</span>
         <span className="utility-side">Panco / Since 2024</span>
       </div>
 
@@ -208,8 +229,7 @@ export default function Home() {
           </nav>
         </div>
         <a className="house-mark" href="#top" aria-label="Panco home">
-          <span className="brand-monogram" aria-hidden="true">P</span>
-          <span className="house-mark__type">Panco</span>
+          <PancoLogo variant="light" />
         </a>
         <div className="top-nav__side top-nav__side--right">
           <button type="button" className="icon-button" aria-label="Search" onClick={() => setSearchOpen(true)}><Search size={20} /></button>
@@ -224,7 +244,7 @@ export default function Home() {
         <section id="hero" className="hero-carousel" aria-label="Featured Panco campaign">
           <img src={slide.image} alt="Panco collection" className="hero-carousel__image" key={slide.image} />
           <div className="hero-carousel__wash" />
-          <div className="hero-house-stamp" aria-hidden="true"><span className="brand-monogram brand-monogram--light">P</span><div><span>Panco</span><small>Objects / studio ledger</small></div></div>
+          <div className="hero-house-stamp" aria-hidden="true"><PancoLogo variant="light" markOnly /><div><span>Panco</span><small>Objects / studio ledger</small></div></div>
           <div className={`hero-content ${slide.align}`}>
             <p className="kicker kicker--light">{slide.eyebrow}</p>
             <h1>{slide.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h1>
@@ -328,12 +348,12 @@ export default function Home() {
       </main>
 
       <footer className="footer">
-        <div className="footer__intro"><a className="footer-brand" href="#top"><span className="brand-monogram brand-monogram--footer" aria-hidden="true">P</span><span>Panco</span></a><p>{isArabic ? "قطع للطريق الطويل. مشطبة يدوياً بعناية ومصممة للاستعمال." : isFrench ? "Des objets pour le long chemin. Finis à la main avec retenue, dessinés pour l’usage." : "Objects for the long way home. Hand-finished with restraint, designed for use."}</p></div>
+        <div className="footer__intro"><a className="footer-brand" href="#top"><PancoLogo variant="light" /></a><p>{isArabic ? "قطع للطريق الطويل. مشطبة يدوياً بعناية ومصممة للاستعمال." : isFrench ? "Des objets pour le long chemin. Finis à la main avec retenue, dessinés pour l’usage." : "Objects for the long way home. Hand-finished with restraint, designed for use."}</p></div>
         <div className="footer__links"><div><p>{isArabic ? "استكشاف" : isFrench ? "Explorer" : "Exploration"}</p><a href="#shop">{copy.nav.shop}</a><a href="#story">{copy.nav.studio}</a><a href="#journal">{copy.nav.journal}</a><a href="#top">{isArabic ? "العناية والإصلاح" : isFrench ? "Soin et réparation" : "Care & repair"}</a></div><div><p>{isArabic ? "عملي" : isFrench ? "Pratique" : "Practical"}</p><a href="#top">{isArabic ? "التوصيل" : isFrench ? "Livraison" : "Delivery"}</a><a href="#top">{isArabic ? "الدفع عند الاستلام" : isFrench ? "Paiement à la livraison" : "Cash on Delivery"}</a><a href="#top">{isArabic ? "الإرجاع" : isFrench ? "Retours" : "Returns"}</a><Link href="/contact">{isArabic ? "تواصل معنا" : isFrench ? "Contact" : "Contact"}</Link></div><div><p>{isArabic ? "تابعنا" : isFrench ? "Suivre" : "Follow"}</p><a href="#top">Instagram</a><a href="#top">Pinterest</a><a href="#top">{isArabic ? "النشرة البريدية" : isFrench ? "Newsletter" : "Newsletter"}</a></div></div>
         <div className="footer__base"><span>© 2026 Panco</span><span>{isArabic ? "صُنع ببطء. استُخدم جيداً." : isFrench ? "Fait lentement. Bien porté." : "Made slowly. Used well."}</span><span>{isArabic ? "الخصوصية / الشروط" : isFrench ? "Confidentialité / Conditions" : "Privacy / Terms"}</span></div>
       </footer>
 
-      {menuOpen && <div className="mobile-menu" role="dialog" aria-modal="true"><div className="mobile-menu__head"><a className="house-mark house-mark--dark" href="#top"><span className="brand-monogram" aria-hidden="true">P</span><span className="house-mark__type">Panco</span></a><button className="icon-button" type="button" onClick={() => setMenuOpen(false)} aria-label={isArabic ? "إغلاق القائمة" : "Close navigation"}><X size={20} /></button></div><nav><a href="#shop" onClick={() => setMenuOpen(false)}><span>01</span> {copy.nav.shop} <ArrowRight size={18} /></a><a href="#collections" onClick={() => setMenuOpen(false)}><span>02</span> {isArabic ? "التشكيلات" : "Collections"} <ArrowRight size={18} /></a><a href="#story" onClick={() => setMenuOpen(false)}><span>03</span> {copy.nav.studio} <ArrowRight size={18} /></a><a href="#journal" onClick={() => setMenuOpen(false)}><span>04</span> {copy.nav.journal} <ArrowRight size={18} /></a><Link href="/contact" onClick={() => setMenuOpen(false)}><span>05</span> {isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"} <ArrowRight size={18} /></Link></nav><button className="mobile-menu__search" type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><Search size={17} /> {isArabic ? "ابحث في بانكو" : isFrench ? "Rechercher Panco" : "Search Panco"}</button></div>}
+      {menuOpen && <div className="mobile-menu" role="dialog" aria-modal="true"><div className="mobile-menu__head"><a className="house-mark house-mark--dark" href="#top"><PancoLogo variant="dark" /></a><button className="icon-button" type="button" onClick={() => setMenuOpen(false)} aria-label={isArabic ? "إغلاق القائمة" : "Close navigation"}><X size={20} /></button></div><nav><a href="#shop" onClick={() => setMenuOpen(false)}><span>01</span> {copy.nav.shop} <ArrowRight size={18} /></a><a href="#collections" onClick={() => setMenuOpen(false)}><span>02</span> {isArabic ? "التشكيلات" : "Collections"} <ArrowRight size={18} /></a><a href="#story" onClick={() => setMenuOpen(false)}><span>03</span> {copy.nav.studio} <ArrowRight size={18} /></a><a href="#journal" onClick={() => setMenuOpen(false)}><span>04</span> {copy.nav.journal} <ArrowRight size={18} /></a><Link href="/contact" onClick={() => setMenuOpen(false)}><span>05</span> {isArabic ? "تواصل" : isFrench ? "Contact" : "Contact"} <ArrowRight size={18} /></Link></nav><button className="mobile-menu__search" type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><Search size={17} /> {isArabic ? "ابحث في بانكو" : isFrench ? "Rechercher Panco" : "Search Panco"}</button></div>}
 
       {searchOpen && <div className="search-overlay" role="dialog" aria-modal="true"><button type="button" className="search-overlay__close" onClick={() => setSearchOpen(false)} aria-label={isArabic ? "إغلاق البحث" : "Close search"}><X size={22} /></button><div><p className="kicker">{isArabic ? "ابحث في بانكو" : isFrench ? "Rechercher Panco" : "Search Panco"}</p><input autoFocus placeholder={isArabic ? "جرّب «محفظة» أو «سفر»" : "Try ‘card wallet’ or ‘travel’"} /><div className="search-suggestions"><span>{isArabic ? "مقترحات" : "Suggested"}</span><button onClick={() => setSearchOpen(false)}>{isArabic ? "حمل يومي" : "Daily carry"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "سفر" : "Travel"}</button><button onClick={() => setSearchOpen(false)}>{isArabic ? "عناية" : "Care"}</button></div></div></div>}
 

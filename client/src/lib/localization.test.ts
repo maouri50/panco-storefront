@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { normalizeLocale } from "@/contexts/LocaleContext";
-import { homeCopy, localizeProduct } from "@/lib/localization";
+import { homeCopy, localizeProduct, productCopy } from "@/lib/localization";
 import { catalogProducts } from "@/lib/catalog";
 
 describe("Locale helpers", () => {
@@ -24,5 +24,12 @@ describe("Locale helpers", () => {
     expect(homeCopy.en.everyday).toBe("Objects for the everyday.");
     expect(homeCopy.fr.everyday).toContain("\n");
     expect(homeCopy.ar.everyday).toContain("\n");
+  });
+
+  it("uses an honest Reviews label and no-review state across supported storefront languages", () => {
+    expect(productCopy.en.customerNotes).toBe("Reviews");
+    expect(productCopy.en.noNotes).toContain("reviews");
+    expect(productCopy.fr.customerNotes).toBe("Avis");
+    expect(productCopy.ar.customerNotes).toBe("التقييمات");
   });
 });
