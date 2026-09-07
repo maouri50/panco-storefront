@@ -15,6 +15,13 @@
       "when": 1787961782463,
       "tag": "0001_swift_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1788393830458,
+      "tag": "0002_tired_nightcrawler",
+      "breakpoints": true
     }
   ]
 }

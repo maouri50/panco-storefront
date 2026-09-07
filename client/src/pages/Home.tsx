@@ -31,6 +31,7 @@ import { trpc } from "@/lib/trpc";
 import { getHeaderTransitionThreshold } from "@/lib/headerTransition";
 import { PancoLogo } from "@/components/PancoLogo";
 import { nextAnnouncementIndex } from "@/lib/announcementRotation";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
@@ -331,7 +332,7 @@ export default function Home() {
 
         <section className="newsletter-section page-section">
           <div><p className="kicker">{copy.stayConnected}</p><h2>{copy.notes.split("\n").map((line, index) => index === 1 ? <em key={line}>{line}</em> : <span key={line}>{line}<br /></span>)}</h2></div>
-          <form className="newsletter-form" onSubmit={(event) => event.preventDefault()}><p>{isArabic ? "قطع جديدة وحكايات من الصنع وأخبار الاستوديو في وقتها. بلا ضجيج." : isFrench ? "Nouveaux objets, histoires de fabrication et nouvelles choisies de l’atelier. Sans bruit." : "New objects, process stories, and carefully timed studio news. No noise."}</p><label htmlFor="newsletter-email">{isArabic ? "البريد الإلكتروني" : isFrench ? "Adresse e-mail" : "Email address"}</label><div><input id="newsletter-email" type="email" placeholder={isArabic ? "name@example.com" : isFrench ? "nom@example.com" : "you@example.com"} /><button aria-label={isArabic ? "اشترك" : isFrench ? "S’inscrire" : "Subscribe"}><ArrowRight size={18} /></button></div><small>{isArabic ? "بالاشتراك، توافق على تلقي مراسلات الاستوديو." : isFrench ? "En vous inscrivant, vous acceptez de recevoir la correspondance de l’atelier." : "By subscribing, you agree to receive studio correspondence."}</small></form>
+          <NewsletterSignup locale={locale} />
         </section>
 
         <section className="faq-section page-section">

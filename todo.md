@@ -214,3 +214,11 @@
 - [ ] Configure the verified Panco sender in Vercel and perform one separately approved email-only inbox-placement test.
 - [x] Investigate the owner-reported non-receipt of a Resend-delivered branded Panco order email without sending another notification.
 - [x] Confirm that a branded Panco sender email is visible in the saadyou50@gmail.com Inbox after switching from the different Gmail account initially open in the browser.
+- [x] Audit the supplied reference’s warm neutral color system and translate its principles into an original Panco palette without copying branding or content.
+- [x] Refine Panco’s public storefront with the approved warm charcoal, tobacco, parchment, and muted olive visual direction.
+- [x] Audit and remove Panco production dependencies that would prevent independent Vercel operation after the current deployment is handed over.
+- [ ] Implement secure independent owner sign-in for `/admin` without hard-coded passwords or Manus-only authentication dependencies.
+- [ ] Provide protected admin workflows for Panco product creation, edits, prices, and published-catalog visibility.
+- [ ] Add persistent, consent-based newsletter subscriber capture and protected owner management.
+- [ ] Verify the independent Vercel production configuration and synchronize the completed Panco release to GitHub.
+- [ ] Diagnose and repair the Production `/admin` unavailable sign-in state after the owner configured the independent admin password.

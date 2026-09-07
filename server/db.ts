@@ -5,11 +5,29 @@ import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+function createDatabase(connectionString: string) {
+  const hostname = new URL(connectionString).hostname;
+
+  if (hostname.endsWith(".tidbcloud.com")) {
+    return drizzle({
+      connection: {
+        uri: connectionString,
+        ssl: {
+          minVersion: "TLSv1.2",
+          rejectUnauthorized: true,
+        },
+      },
+    });
+  }
+
+  return drizzle(connectionString);
+}
+
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _db = createDatabase(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
