@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { clearAdminSession, isAdminConfigured, setAdminSession, verifyAdminCredentials } from "./adminAuth";
+import { clearAdminSession, getAdminConfigurationStatus, isAdminConfigured, setAdminSession, verifyAdminCredentials } from "./adminAuth";
 import { getAnnouncementConfig, saveAnnouncementConfig } from "./announcementStore";
 import { createCatalogItem, deleteCatalogItem, listCatalogItems, seedCatalogItems, updateCatalogItem } from "./catalogStore";
 import { initialCatalogItems } from "./catalogDefaults";
@@ -27,7 +27,7 @@ const announcementInput = z.object({
 
 export const appRouter = router({
   adminAuth: router({
-    status: publicProcedure.query(({ ctx }) => ({ configured: isAdminConfigured(), signedIn: ctx.isAdmin, email: ctx.admin?.email ?? null })),
+    status: publicProcedure.query(({ ctx }) => ({ configured: isAdminConfigured(), configuration: getAdminConfigurationStatus(), signedIn: ctx.isAdmin, email: ctx.admin?.email ?? null })),
     login: publicProcedure.input(z.object({ email: z.string().trim().email().max(320), password: z.string().min(1).max(128) })).mutation(async ({ ctx, input }) => {
       if (!isAdminConfigured()) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Owner sign-in is not configured in Vercel yet." });
       if (!verifyAdminCredentials(input.email, input.password)) throw new TRPCError({ code: "UNAUTHORIZED", message: "The email or password is incorrect." });

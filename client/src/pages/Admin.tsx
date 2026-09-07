@@ -24,6 +24,12 @@ function OwnerLogin() {
 export default function Admin() {
   const authStatus = trpc.adminAuth.status.useQuery(undefined, { retry: false });
   const isAdmin = Boolean(authStatus.data?.signedIn);
+  const configuration = authStatus.data?.configuration;
+  const incompleteConfiguration = configuration ? [
+    !configuration.email && "ADMIN_EMAIL",
+    !configuration.password && "ADMIN_PASSWORD",
+    !configuration.sessionSecret && "ADMIN_SESSION_SECRET",
+  ].filter((item): item is string => Boolean(item)) : [];
   const catalogQuery = trpc.catalog.adminList.useQuery(undefined, { enabled: isAdmin, retry: false });
   const announcementQuery = trpc.announcements.publicConfig.useQuery();
   const subscribersQuery = trpc.newsletter.adminList.useQuery(undefined, { enabled: isAdmin, retry: false });
@@ -46,7 +52,7 @@ export default function Admin() {
   const submit = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); const colors = lines(form.colors).map(line => { const [name, color, image] = line.split("|").map(value => value.trim()); return { name: name || "Leather", color: color || "#805238", image: image || form.image }; }); const item = { slug: form.slug || slugify(form.name), name: form.name, category: form.category, price: form.price, was: form.was || undefined, tag: form.tag || undefined, image: form.image, gallery: lines(form.gallery).length ? lines(form.gallery) : [form.image], colors, swatches: colors.map(color => color.color), description: form.description, highlights: lines(form.highlights), published: form.published, displayOrder: Number(form.displayOrder) || 0 }; if (form.id) updateItem.mutate({ id: form.id, item }); else createItem.mutate(item); };
 
   if (authStatus.isLoading) return <main className="admin-shell admin-state"><p className="admin-eyebrow">Panco / Admin</p><h1>Opening the<br /><em>catalog ledger.</em></h1></main>;
-  if (!authStatus.data?.configured) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>One secure<br /><em>step remains.</em></h1><p>Before first sign-in, add <code>ADMIN_EMAIL</code>, <code>ADMIN_PASSWORD</code>, and <code>ADMIN_SESSION_SECRET</code> as encrypted environment values in the Panco Vercel project. Use a password of at least 12 characters and a random session value of at least 32 characters. Do not place either value in GitHub.</p></main>;
+  if (!authStatus.data?.configured) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>One secure<br /><em>step remains.</em></h1><p>{incompleteConfiguration.length ? <>Panco cannot read a valid Production value for <code>{incompleteConfiguration.join(", ")}</code>. In the <strong>panco-storefront</strong> Vercel project, save it as a Production environment value and redeploy. The password must be at least 12 characters and the session secret at least 32 characters.</> : <>Before first sign-in, add <code>ADMIN_EMAIL</code>, <code>ADMIN_PASSWORD</code>, and <code>ADMIN_SESSION_SECRET</code> as encrypted environment values in the Panco Vercel project. Use a password of at least 12 characters and a random session value of at least 32 characters. Do not place either value in GitHub.</>}</p></main>;
   if (!isAdmin) return <OwnerLogin />;
   if (catalogQuery.isLoading) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>Opening the<br /><em>object ledger.</em></h1></main>;
   if (catalogQuery.error) return <main className="admin-shell admin-state"><Link href="/" className="admin-back"><ArrowLeft size={15} /> Back to storefront</Link><p className="admin-eyebrow">Private catalog desk</p><h1>The ledger<br /><em>is unavailable.</em></h1><p>{catalogQuery.error.message}</p><button type="button" className="admin-primary" onClick={() => catalogQuery.refetch()}>Try again <ChevronRight size={16} /></button></main>;

@@ -10,6 +10,12 @@ export type AdminSession = {
   email: string;
 };
 
+export type AdminConfigurationStatus = {
+  email: boolean;
+  password: boolean;
+  sessionSecret: boolean;
+};
+
 const getConfiguration = () => ({
   email: process.env.ADMIN_EMAIL?.trim().toLowerCase() ?? "",
   password: process.env.ADMIN_PASSWORD ?? "",
@@ -23,9 +29,18 @@ const digestEquals = (left: string, right: string) => crypto.timingSafeEqual(
   crypto.createHash("sha256").update(right).digest(),
 );
 
-export function isAdminConfigured() {
+export function getAdminConfigurationStatus(): AdminConfigurationStatus {
   const { email, password, sessionSecret } = getConfiguration();
-  return /^\S+@\S+\.\S+$/.test(email) && password.length >= 12 && sessionSecret.length >= 32;
+  return {
+    email: /^\S+@\S+\.\S+$/.test(email),
+    password: password.length >= 12,
+    sessionSecret: sessionSecret.length >= 32,
+  };
+}
+
+export function isAdminConfigured() {
+  const configuration = getAdminConfigurationStatus();
+  return configuration.email && configuration.password && configuration.sessionSecret;
 }
 
 export function verifyAdminCredentials(email: string, password: string) {

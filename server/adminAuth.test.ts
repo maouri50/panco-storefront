@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { getAdminSession, isAdminConfigured, issueAdminSessionToken, verifyAdminCredentials } from "./adminAuth";
+import { getAdminConfigurationStatus, getAdminSession, isAdminConfigured, issueAdminSessionToken, verifyAdminCredentials } from "./adminAuth";
 
 const savedEnvironment = { ...process.env };
 
@@ -15,6 +15,13 @@ describe("independent Panco admin authentication", () => {
     expect(isAdminConfigured()).toBe(true);
     expect(verifyAdminCredentials("OWNER@typeitaliano.com", "winter-river-quiet-stone")).toBe(true);
     expect(verifyAdminCredentials("owner@typeitaliano.com", "incorrect-password")).toBe(false);
+  });
+
+  it("reports only missing configuration categories, never the configured values", () => {
+    process.env.ADMIN_EMAIL = "not-an-email";
+    process.env.ADMIN_PASSWORD = "short";
+    process.env.ADMIN_SESSION_SECRET = "too-short";
+    expect(getAdminConfigurationStatus()).toEqual({ email: false, password: false, sessionSecret: false });
   });
 
   it("accepts a current signed owner session and rejects it when the password changes", async () => {
