@@ -20,6 +20,8 @@ export const defaultAnnouncementConfig: AnnouncementConfig = {
   rotationSeconds: 4,
 };
 
+let announcementStorageUnavailable = false;
+
 const parseMessages = (value: string) => {
   try {
     const parsed = JSON.parse(value);
@@ -28,17 +30,32 @@ const parseMessages = (value: string) => {
 };
 
 export async function getAnnouncementConfig(): Promise<AnnouncementConfig> {
+  if (announcementStorageUnavailable) return defaultAnnouncementConfig;
   const db = await getDb();
   if (!db) return defaultAnnouncementConfig;
-  const [row] = await db.select().from(announcementSettings).where(eq(announcementSettings.id, 1)).limit(1);
-  if (!row) return defaultAnnouncementConfig;
-  return { enabled: row.enabled, messages: parseMessages(row.messagesJson).slice(0, 12), backgroundColor: row.backgroundColor, textColor: row.textColor, fontStyle: row.fontStyle as AnnouncementConfig["fontStyle"], rotationSeconds: row.rotationSeconds };
+  try {
+    const [row] = await db.select().from(announcementSettings).where(eq(announcementSettings.id, 1)).limit(1);
+    if (!row) return defaultAnnouncementConfig;
+    return { enabled: row.enabled, messages: parseMessages(row.messagesJson).slice(0, 12), backgroundColor: row.backgroundColor, textColor: row.textColor, fontStyle: row.fontStyle as AnnouncementConfig["fontStyle"], rotationSeconds: row.rotationSeconds };
+  } catch (error) {
+    // Keep the storefront usable while a first production deployment is
+    // waiting for its database migrations.
+    announcementStorageUnavailable = true;
+    console.warn("[Announcements] Falling back to the default bar:", error);
+    return defaultAnnouncementConfig;
+  }
 }
 
 export async function saveAnnouncementConfig(config: AnnouncementConfig) {
   const db = await getDb();
   if (!db) throw new Error("Announcement settings database is unavailable.");
   const values = { id: 1, enabled: config.enabled, messagesJson: JSON.stringify(config.messages), backgroundColor: config.backgroundColor, textColor: config.textColor, fontStyle: config.fontStyle, rotationSeconds: config.rotationSeconds };
-  await db.insert(announcementSettings).values(values).onDuplicateKeyUpdate({ set: values });
+  announcementStorageUnavailable = false;
+  try {
+    await db.insert(announcementSettings).values(values).onDuplicateKeyUpdate({ set: values });
+  } catch (error) {
+    announcementStorageUnavailable = true;
+    throw error;
+  }
   return getAnnouncementConfig();
 }

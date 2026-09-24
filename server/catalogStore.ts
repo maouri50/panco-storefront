@@ -67,10 +67,18 @@ const toValues = (item: CatalogInput): InsertCatalogItem => ({
 export async function listCatalogItems(publicOnly = false) {
   const db = await getDb();
   if (!db) return [];
-  const rows = publicOnly
-    ? await db.select().from(catalogItems).where(eq(catalogItems.published, true)).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt))
-    : await db.select().from(catalogItems).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt));
-  return rows.map(mapCatalogItem);
+  try {
+    const rows = publicOnly
+      ? await db.select().from(catalogItems).where(eq(catalogItems.published, true)).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt))
+      : await db.select().from(catalogItems).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt));
+    return rows.map(mapCatalogItem);
+  } catch (error) {
+    if (publicOnly) {
+      console.warn("[Catalog] Public catalog unavailable; returning an empty result:", error);
+      return [];
+    }
+    throw error;
+  }
 }
 
 export async function createCatalogItem(input: CatalogInput) {
