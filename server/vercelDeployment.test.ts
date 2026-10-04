@@ -18,6 +18,10 @@ describe("Panco Vercel deployment configuration", () => {
       buildCommand: "pnpm run build:vercel",
       outputDirectory: "dist/public",
     });
+    const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8")) as {
+      scripts?: Record<string, string>;
+    };
+    expect(packageJson.scripts?.["build:vercel"]).toContain("NODE_ENV=production vite build");
     expect(vercelConfig.rewrites).toContainEqual({ source: "/api/:path*", destination: "/api/[...path]" });
     expect(vercelConfig.rewrites).toContainEqual({ source: "/:path*", destination: "/index.html" });
     expect(fs.existsSync(path.join(projectRoot, "server", "vercelApiApp.ts"))).toBe(true);

@@ -150,46 +150,44 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-export default defineConfig(({ mode }) => {
-  const isProductionBuild = mode === "production";
-  // Manus preview tooling is useful during development, but its runtime plugin
-  // injects a large debug bootstrap into index.html. Vercel should ship only
-  // the storefront itself.
-  const plugins = isProductionBuild
-    ? [react(), tailwindcss()]
-    : [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+// Manus preview tooling is useful during development, but its runtime plugin
+// injects a large debug bootstrap into index.html. Production builds receive
+// NODE_ENV=production through the package scripts below and ship only Panco.
+const isProductionBuild = process.env.NODE_ENV === "production";
+const plugins = isProductionBuild
+  ? [react(), tailwindcss()]
+  : [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
-  return {
-    plugins,
-    resolve: {
-      alias: {
-        "@": path.resolve(import.meta.dirname, "client", "src"),
-        "@shared": path.resolve(import.meta.dirname, "shared"),
-        "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-      },
+export default defineConfig({
+  plugins,
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
-    envDir: path.resolve(import.meta.dirname),
-    root: path.resolve(import.meta.dirname, "client"),
-    publicDir: path.resolve(import.meta.dirname, "client", "public"),
-    build: {
-      outDir: path.resolve(import.meta.dirname, "dist/public"),
-      emptyOutDir: true,
+  },
+  envDir: path.resolve(import.meta.dirname),
+  root: path.resolve(import.meta.dirname, "client"),
+  publicDir: path.resolve(import.meta.dirname, "client", "public"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true,
+  },
+  server: {
+    host: true,
+    allowedHosts: [
+      ".manuspre.computer",
+      ".manus.computer",
+      ".manus-asia.computer",
+      ".manuscomputer.ai",
+      ".manusvm.computer",
+      "localhost",
+      "127.0.0.1",
+    ],
+    fs: {
+      strict: true,
+      deny: ["**/.*"],
     },
-    server: {
-      host: true,
-      allowedHosts: [
-        ".manuspre.computer",
-        ".manus.computer",
-        ".manus-asia.computer",
-        ".manuscomputer.ai",
-        ".manusvm.computer",
-        "localhost",
-        "127.0.0.1",
-      ],
-      fs: {
-        strict: true,
-        deny: ["**/.*"],
-      },
-    },
-  };
+  },
 });
