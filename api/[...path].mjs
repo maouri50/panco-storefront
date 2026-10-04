@@ -3,50 +3,150 @@ import "dotenv/config";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import express from "express";
 
-// shared/const.ts
-var COOKIE_NAME = "app_session_id";
-var ONE_YEAR_MS = 1e3 * 60 * 60 * 24 * 365;
-var AXIOS_TIMEOUT_MS = 3e4;
-var UNAUTHED_ERR_MSG = "Please login (10001)";
-var NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
-var OAUTH_STATE_COOKIE = "__Host-oauth_state";
-var decodeOAuthState = (state) => {
-  let decoded;
-  try {
-    decoded = atob(state);
-  } catch {
-    return { redirectUri: "" };
-  }
-  try {
-    const parsed = JSON.parse(decoded);
-    if (parsed && typeof parsed.redirectUri === "string") return parsed;
-  } catch {
-  }
-  return { redirectUri: decoded };
-};
+// server/routers.ts
+import { TRPCError as TRPCError2 } from "@trpc/server";
+import { z as z2 } from "zod";
 
-// server/_core/cookies.ts
-function isSecureRequest(req) {
-  if (req.protocol === "https") return true;
-  const forwardedProto = req.headers["x-forwarded-proto"];
-  if (!forwardedProto) return false;
-  const protoList = Array.isArray(forwardedProto) ? forwardedProto : forwardedProto.split(",");
-  return protoList.some((proto) => proto.trim().toLowerCase() === "https");
-}
-function getSessionCookieOptions(req) {
+// server/adminAuth.ts
+import crypto2 from "node:crypto";
+import { parse } from "cookie";
+import { SignJWT, jwtVerify } from "jose";
+var ADMIN_SESSION_COOKIE = "panco_admin_session";
+var SESSION_DURATION_SECONDS = 60 * 60 * 12;
+var getConfiguration = () => ({
+  email: process.env.ADMIN_EMAIL?.trim().toLowerCase() ?? "",
+  password: process.env.ADMIN_PASSWORD ?? "",
+  sessionSecret: process.env.ADMIN_SESSION_SECRET ?? ""
+});
+var secretBytes = (value) => new TextEncoder().encode(value);
+var fingerprint = (value) => crypto2.createHash("sha256").update(value).digest("hex");
+var digestEquals = (left, right) => crypto2.timingSafeEqual(
+  crypto2.createHash("sha256").update(left).digest(),
+  crypto2.createHash("sha256").update(right).digest()
+);
+function getAdminConfigurationStatus() {
+  const { email, password, sessionSecret } = getConfiguration();
   return {
-    httpOnly: true,
-    path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req)
+    email: /^\S+@\S+\.\S+$/.test(email),
+    password: password.length >= 12,
+    sessionSecret: sessionSecret.length >= 32
   };
 }
+function isAdminConfigured() {
+  const configuration = getAdminConfigurationStatus();
+  return configuration.email && configuration.password && configuration.sessionSecret;
+}
+function verifyAdminCredentials(email, password) {
+  if (!isAdminConfigured()) return false;
+  const configuration = getConfiguration();
+  return digestEquals(email.trim().toLowerCase(), configuration.email) && digestEquals(password, configuration.password);
+}
+async function issueAdminSessionToken(email) {
+  const configuration = getConfiguration();
+  if (!isAdminConfigured()) throw new Error("Panco admin credentials are not configured.");
+  return new SignJWT({
+    email: email.trim().toLowerCase(),
+    role: "admin",
+    passwordVersion: fingerprint(configuration.password)
+  }).setProtectedHeader({ alg: "HS256", typ: "JWT" }).setIssuer("panco-admin").setAudience("panco-admin").setIssuedAt().setExpirationTime(`${SESSION_DURATION_SECONDS}s`).sign(secretBytes(configuration.sessionSecret));
+}
+async function getAdminSession(req) {
+  if (!isAdminConfigured()) return null;
+  const token = parse(req.headers.cookie ?? "")[ADMIN_SESSION_COOKIE];
+  if (!token) return null;
+  try {
+    const configuration = getConfiguration();
+    const { payload } = await jwtVerify(token, secretBytes(configuration.sessionSecret), {
+      algorithms: ["HS256"],
+      issuer: "panco-admin",
+      audience: "panco-admin"
+    });
+    const email = typeof payload.email === "string" ? payload.email : "";
+    const passwordVersion = typeof payload.passwordVersion === "string" ? payload.passwordVersion : "";
+    if (payload.role !== "admin" || !email || !digestEquals(email, configuration.email)) return null;
+    if (!digestEquals(passwordVersion, fingerprint(configuration.password))) return null;
+    return { email };
+  } catch {
+    return null;
+  }
+}
+function useSecureCookie(req) {
+  return process.env.NODE_ENV === "production" || req.secure || req.headers["x-forwarded-proto"] === "https";
+}
+function cookieOptions(req) {
+  return {
+    httpOnly: true,
+    secure: useSecureCookie(req),
+    sameSite: "lax",
+    path: "/"
+  };
+}
+async function setAdminSession(res, req, email) {
+  const token = await issueAdminSessionToken(email);
+  res.cookie(ADMIN_SESSION_COOKIE, token, { ...cookieOptions(req), maxAge: SESSION_DURATION_SECONDS * 1e3 });
+}
+function clearAdminSession(res, req) {
+  res.clearCookie(ADMIN_SESSION_COOKIE, cookieOptions(req));
+}
 
-// server/_core/systemRouter.ts
-import { z } from "zod";
+// server/announcementStore.ts
+import { eq as eq2 } from "drizzle-orm";
 
-// server/_core/notification.ts
-import { TRPCError } from "@trpc/server";
+// drizzle/schema.ts
+import { boolean, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+var users = mysqlTable("users", {
+  id: int("id").autoincrement().primaryKey(),
+  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  name: text("name"),
+  email: varchar("email", { length: 320 }),
+  loginMethod: varchar("loginMethod", { length: 64 }),
+  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull()
+});
+var catalogItems = mysqlTable("catalog_items", {
+  id: int("id").autoincrement().primaryKey(),
+  slug: varchar("slug", { length: 160 }).notNull(),
+  name: varchar("name", { length: 160 }).notNull(),
+  category: varchar("category", { length: 120 }).notNull(),
+  price: varchar("price", { length: 32 }).notNull(),
+  was: varchar("was", { length: 32 }),
+  image: text("image").notNull(),
+  galleryJson: text("galleryJson").notNull(),
+  swatchesJson: text("swatchesJson").notNull(),
+  colorsJson: text("colorsJson").notNull(),
+  tag: varchar("tag", { length: 80 }),
+  description: text("description").notNull(),
+  highlightsJson: text("highlightsJson").notNull(),
+  published: boolean("published").notNull().default(true),
+  displayOrder: int("displayOrder").notNull().default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+}, (table) => [uniqueIndex("catalog_items_slug_unique").on(table.slug), index("catalog_items_public_order").on(table.published, table.displayOrder)]);
+var announcementSettings = mysqlTable("announcement_settings", {
+  id: int("id").primaryKey(),
+  enabled: boolean("enabled").notNull().default(true),
+  messagesJson: text("messagesJson").notNull(),
+  backgroundColor: varchar("backgroundColor", { length: 24 }).notNull().default("#18362a"),
+  textColor: varchar("textColor", { length: 24 }).notNull().default("#f6f5f2"),
+  fontStyle: varchar("fontStyle", { length: 24 }).notNull().default("mono"),
+  rotationSeconds: int("rotationSeconds").notNull().default(4),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var newsletterSubscribers = mysqlTable("newsletter_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["subscribed", "unsubscribed"]).notNull().default("subscribed"),
+  consentedAt: timestamp("consentedAt").defaultNow().notNull(),
+  unsubscribedAt: timestamp("unsubscribedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+}, (table) => [uniqueIndex("newsletter_subscribers_email_unique").on(table.email), index("newsletter_subscribers_status").on(table.status, table.consentedAt)]);
+
+// server/db.ts
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
 
 // server/_core/env.ts
 var ENV = {
@@ -60,148 +160,180 @@ var ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? ""
 };
 
-// server/_core/notification.ts
-var TITLE_MAX_LENGTH = 1200;
-var CONTENT_MAX_LENGTH = 2e4;
-var trimValue = (value) => value.trim();
-var isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
-var buildEndpointUrl = (baseUrl) => {
-  const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  return new URL(
-    "webdevtoken.v1.WebDevService/SendNotification",
-    normalizedBase
-  ).toString();
-};
-var validatePayload = (input) => {
-  if (!isNonEmptyString(input.title)) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Notification title is required."
-    });
-  }
-  if (!isNonEmptyString(input.content)) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Notification content is required."
-    });
-  }
-  const title = trimValue(input.title);
-  const content = trimValue(input.content);
-  if (title.length > TITLE_MAX_LENGTH) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: `Notification title must be at most ${TITLE_MAX_LENGTH} characters.`
-    });
-  }
-  if (content.length > CONTENT_MAX_LENGTH) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: `Notification content must be at most ${CONTENT_MAX_LENGTH} characters.`
-    });
-  }
-  return { title, content };
-};
-async function notifyOwner(payload) {
-  const { title, content } = validatePayload(payload);
-  if (!ENV.forgeApiUrl) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Notification service URL is not configured."
-    });
-  }
-  if (!ENV.forgeApiKey) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Notification service API key is not configured."
-    });
-  }
-  const endpoint = buildEndpointUrl(ENV.forgeApiUrl);
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        authorization: `Bearer ${ENV.forgeApiKey}`,
-        "content-type": "application/json",
-        "connect-protocol-version": "1"
-      },
-      body: JSON.stringify({ title, content })
-    });
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      console.warn(
-        `[Notification] Failed to notify owner (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`
-      );
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.warn("[Notification] Error calling notification service:", error);
-    return false;
-  }
-}
-
-// server/_core/trpc.ts
-import { initTRPC, TRPCError as TRPCError2 } from "@trpc/server";
-import superjson from "superjson";
-var t = initTRPC.context().create({
-  transformer: superjson
-});
-var router = t.router;
-var publicProcedure = t.procedure;
-var requireUser = t.middleware(async (opts) => {
-  const { ctx, next } = opts;
-  if (!ctx.user) {
-    throw new TRPCError2({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
-  }
-  return next({
-    ctx: {
-      ...ctx,
-      user: ctx.user
-    }
-  });
-});
-var protectedProcedure = t.procedure.use(requireUser);
-var adminProcedure = t.procedure.use(
-  t.middleware(async (opts) => {
-    const { ctx, next } = opts;
-    if (!ctx.user || ctx.user.role !== "admin") {
-      throw new TRPCError2({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
-    }
-    return next({
-      ctx: {
-        ...ctx,
-        user: ctx.user
+// server/db.ts
+var _db = null;
+function createDatabase(connectionString) {
+  const hostname = new URL(connectionString).hostname;
+  if (hostname.endsWith(".tidbcloud.com")) {
+    return drizzle({
+      connection: {
+        uri: connectionString,
+        ssl: {
+          minVersion: "TLSv1.2",
+          rejectUnauthorized: true
+        }
       }
     });
-  })
-);
+  }
+  return drizzle(connectionString);
+}
+async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = createDatabase(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
+      _db = null;
+    }
+  }
+  return _db;
+}
 
-// server/_core/systemRouter.ts
-var systemRouter = router({
-  health: publicProcedure.input(
-    z.object({
-      timestamp: z.number().min(0, "timestamp cannot be negative")
-    })
-  ).query(() => ({
-    ok: true
-  })),
-  notifyOwner: adminProcedure.input(
-    z.object({
-      title: z.string().min(1, "title is required"),
-      content: z.string().min(1, "content is required")
-    })
-  ).mutation(async ({ input }) => {
-    const delivered = await notifyOwner(input);
-    return {
-      success: delivered
-    };
-  })
+// server/announcementStore.ts
+var defaultAnnouncementConfig = {
+  enabled: true,
+  messages: ["Cash on Delivery available", "Hand-finished leather goods", "Panco / measured objects"],
+  backgroundColor: "#18362a",
+  textColor: "#f6f5f2",
+  fontStyle: "mono",
+  rotationSeconds: 4
+};
+var announcementStorageUnavailable = false;
+var parseMessages = (value) => {
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string" && item.trim().length > 0) : [];
+  } catch {
+    return [];
+  }
+};
+async function getAnnouncementConfig() {
+  if (announcementStorageUnavailable) return defaultAnnouncementConfig;
+  const db = await getDb();
+  if (!db) return defaultAnnouncementConfig;
+  try {
+    const [row] = await db.select().from(announcementSettings).where(eq2(announcementSettings.id, 1)).limit(1);
+    if (!row) return defaultAnnouncementConfig;
+    return { enabled: row.enabled, messages: parseMessages(row.messagesJson).slice(0, 12), backgroundColor: row.backgroundColor, textColor: row.textColor, fontStyle: row.fontStyle, rotationSeconds: row.rotationSeconds };
+  } catch (error) {
+    announcementStorageUnavailable = true;
+    console.warn("[Announcements] Falling back to the default bar:", error);
+    return defaultAnnouncementConfig;
+  }
+}
+async function saveAnnouncementConfig(config) {
+  const db = await getDb();
+  if (!db) throw new Error("Announcement settings database is unavailable.");
+  const values = { id: 1, enabled: config.enabled, messagesJson: JSON.stringify(config.messages), backgroundColor: config.backgroundColor, textColor: config.textColor, fontStyle: config.fontStyle, rotationSeconds: config.rotationSeconds };
+  announcementStorageUnavailable = false;
+  try {
+    await db.insert(announcementSettings).values(values).onDuplicateKeyUpdate({ set: values });
+  } catch (error) {
+    announcementStorageUnavailable = true;
+    throw error;
+  }
+  return getAnnouncementConfig();
+}
+
+// server/catalogStore.ts
+import { asc, desc, eq as eq3 } from "drizzle-orm";
+var parseArray = (value, fallback) => {
+  try {
+    const result = JSON.parse(value);
+    return Array.isArray(result) ? result : fallback;
+  } catch {
+    return fallback;
+  }
+};
+var mapCatalogItem = (item) => ({
+  id: item.id,
+  slug: item.slug,
+  name: item.name,
+  category: item.category,
+  price: item.price,
+  was: item.was ?? void 0,
+  image: item.image,
+  gallery: parseArray(item.galleryJson, [item.image]),
+  swatches: parseArray(item.swatchesJson, []),
+  colors: parseArray(item.colorsJson, []),
+  tag: item.tag ?? void 0,
+  description: item.description,
+  highlights: parseArray(item.highlightsJson, []),
+  published: item.published,
+  displayOrder: item.displayOrder
 });
+var toValues = (item) => ({
+  slug: item.slug,
+  name: item.name,
+  category: item.category,
+  price: item.price,
+  was: item.was ?? null,
+  image: item.image,
+  galleryJson: JSON.stringify(item.gallery),
+  swatchesJson: JSON.stringify(item.swatches),
+  colorsJson: JSON.stringify(item.colors),
+  tag: item.tag ?? null,
+  description: item.description,
+  highlightsJson: JSON.stringify(item.highlights),
+  published: item.published,
+  displayOrder: item.displayOrder
+});
+async function listCatalogItems(publicOnly = false) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const rows = publicOnly ? await db.select().from(catalogItems).where(eq3(catalogItems.published, true)).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt)) : await db.select().from(catalogItems).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt));
+    return rows.map(mapCatalogItem);
+  } catch (error) {
+    if (publicOnly) {
+      console.warn("[Catalog] Public catalog unavailable; returning an empty result:", error);
+      return [];
+    }
+    throw error;
+  }
+}
+async function createCatalogItem(input) {
+  const db = await getDb();
+  if (!db) throw new Error("Catalog database is unavailable.");
+  await db.insert(catalogItems).values(toValues(input));
+  const [created] = await db.select().from(catalogItems).where(eq3(catalogItems.slug, input.slug)).limit(1);
+  if (!created) throw new Error("Catalog item could not be created.");
+  return mapCatalogItem(created);
+}
+async function updateCatalogItem(id, input) {
+  const db = await getDb();
+  if (!db) throw new Error("Catalog database is unavailable.");
+  await db.update(catalogItems).set(toValues(input)).where(eq3(catalogItems.id, id));
+  const [updated] = await db.select().from(catalogItems).where(eq3(catalogItems.id, id)).limit(1);
+  if (!updated) throw new Error("Catalog item could not be updated.");
+  return mapCatalogItem(updated);
+}
+async function deleteCatalogItem(id) {
+  const db = await getDb();
+  if (!db) throw new Error("Catalog database is unavailable.");
+  await db.delete(catalogItems).where(eq3(catalogItems.id, id));
+}
+async function seedCatalogItems(items) {
+  const db = await getDb();
+  if (!db) throw new Error("Catalog database is unavailable.");
+  const [existing] = await db.select({ count: catalogItems.id }).from(catalogItems).limit(1);
+  if (existing?.count) return listCatalogItems();
+  await db.insert(catalogItems).values(items.map(toValues));
+  return listCatalogItems();
+}
 
-// server/routers.ts
-import { TRPCError as TRPCError3 } from "@trpc/server";
-import { z as z2 } from "zod";
+// server/catalogDefaults.ts
+var cardholder = "/manus-storage/north-atelier-cardholder_12ba7095.jpg";
+var tote = "/manus-storage/north-atelier-tote_a6b855c4.jpg";
+var weekender = "/manus-storage/north-atelier-weekender_e238bcf4.webp";
+var hero = "/manus-storage/north-atelier-hero_6fac9d50.jpg";
+var workshop = "/manus-storage/north-atelier-workshop_151c4843.jpg";
+var initialCatalogItems = [
+  { slug: "atlas-card-wallet", name: "Atlas Card Wallet", category: "Small leather goods", price: "$78", was: "$92", image: cardholder, gallery: [cardholder, cardholder, cardholder], swatches: ["#66363f", "#352a2a"], colors: [{ name: "Oxblood", color: "#66363f", image: cardholder }, { name: "Night brown", color: "#352a2a", image: cardholder }], tag: "New", description: "A compact wallet cut for the cards, cash, and small routines that stay closest. Light in the hand, softly structured, and finished to improve with use.", highlights: ["Four card slots with a folded bill pocket", "Vegetable-tanned full-grain leather", "Hand-burnished edges and saddle stitching", "Small enough for front-pocket carry"], published: true, displayOrder: 1 },
+  { slug: "morrow-tote", name: "Morrow Tote", category: "Daily carry", price: "$248", image: tote, gallery: [tote, workshop, hero], swatches: ["#A45F3D", "#8A593C"], colors: [{ name: "Saddle", color: "#A45F3D", image: tote }, { name: "Umber", color: "#8A593C", image: hero }], description: "A generous everyday tote balanced between soft proportion and uncomplicated utility. Built for a notebook, a layer, and the objects that make a day work.", highlights: ["Magnetic top closure", "Interior hanging pocket", "Comfortable shoulder straps", "Solid brass hardware"], published: true, displayOrder: 2 },
+  { slug: "rook-field-bag", name: "Rook Field Bag", category: "Shoulder bag", price: "$186", was: "$214", image: weekender, gallery: [weekender, workshop, cardholder], swatches: ["#A55E33", "#633B22"], colors: [{ name: "Cedar", color: "#A55E33", image: weekender }, { name: "Chestnut", color: "#633B22", image: cardholder }], tag: "Studio edit", description: "A field-sized bag for the things that should be within reach. Its compact silhouette carries the small architecture of a day without asking for attention.", highlights: ["Adjustable shoulder strap", "Front utility pocket", "Soft-lined interior", "Made in a limited workshop run"], published: true, displayOrder: 3 },
+  { slug: "long-mile-duffle", name: "Long Mile Duffle", category: "Weekend carry", price: "$320", image: hero, gallery: [hero, workshop, tote], swatches: ["#6D3D24", "#352B22"], colors: [{ name: "Oxhide", color: "#6D3D24", image: hero }, { name: "Dark umber", color: "#352B22", image: tote }], description: "A soft-sided duffle for one good night away or a few days beyond the familiar. Balanced carry, durable zips, and a shape that gets better with every trip.", highlights: ["Wide zip opening", "Removable shoulder strap", "Reinforced leather base", "Cabin-ready proportions"], published: true, displayOrder: 4 }
+];
 
 // server/orderNotifications.ts
 var escapeHtml = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -398,262 +530,71 @@ async function sendContactNotifications(inquiry, config = getNotificationConfig(
   return { email, telegram };
 }
 
-// server/catalogStore.ts
-import { asc, desc, eq as eq2 } from "drizzle-orm";
-
-// drizzle/schema.ts
-import { boolean, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
-var users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
-  id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull()
-});
-var catalogItems = mysqlTable(
-  "catalog_items",
-  {
-    id: int("id").autoincrement().primaryKey(),
-    slug: varchar("slug", { length: 160 }).notNull(),
-    name: varchar("name", { length: 160 }).notNull(),
-    category: varchar("category", { length: 120 }).notNull(),
-    price: varchar("price", { length: 32 }).notNull(),
-    was: varchar("was", { length: 32 }),
-    image: text("image").notNull(),
-    galleryJson: text("galleryJson").notNull(),
-    swatchesJson: text("swatchesJson").notNull(),
-    colorsJson: text("colorsJson").notNull(),
-    tag: varchar("tag", { length: 80 }),
-    description: text("description").notNull(),
-    highlightsJson: text("highlightsJson").notNull(),
-    published: boolean("published").notNull().default(true),
-    displayOrder: int("displayOrder").notNull().default(0),
-    createdAt: timestamp("createdAt").defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-  },
-  (table) => [uniqueIndex("catalog_items_slug_unique").on(table.slug), index("catalog_items_public_order").on(table.published, table.displayOrder)]
-);
-var announcementSettings = mysqlTable("announcement_settings", {
-  id: int("id").primaryKey(),
-  enabled: boolean("enabled").notNull().default(true),
-  messagesJson: text("messagesJson").notNull(),
-  backgroundColor: varchar("backgroundColor", { length: 24 }).notNull().default("#18362a"),
-  textColor: varchar("textColor", { length: 24 }).notNull().default("#f6f5f2"),
-  fontStyle: varchar("fontStyle", { length: 24 }).notNull().default("mono"),
-  rotationSeconds: int("rotationSeconds").notNull().default(4),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-
-// server/db.ts
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
-var _db = null;
-async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
-    }
-  }
-  return _db;
-}
-async function upsertUser(user) {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
+// server/newsletterStore.ts
+import { desc as desc2, eq as eq4 } from "drizzle-orm";
+var normalizeNewsletterEmail = (email) => email.trim().toLowerCase();
+async function subscribeToNewsletter(email) {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
+  if (!db) throw new Error("The Panco newsletter list is not configured yet.");
+  const normalizedEmail = normalizeNewsletterEmail(email);
+  const now = /* @__PURE__ */ new Date();
+  const existing = await db.select().from(newsletterSubscribers).where(eq4(newsletterSubscribers.email, normalizedEmail)).limit(1);
+  if (existing[0]) {
+    await db.update(newsletterSubscribers).set({ status: "subscribed", consentedAt: now, unsubscribedAt: null }).where(eq4(newsletterSubscribers.id, existing[0].id));
+  } else {
+    await db.insert(newsletterSubscribers).values({ email: normalizedEmail, status: "subscribed", consentedAt: now });
   }
-  try {
-    const values = {
-      openId: user.openId
-    };
-    const updateSet = {};
-    const textFields = ["name", "email", "loginMethod"];
-    const assignNullable = (field) => {
-      const value = user[field];
-      if (value === void 0) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-    textFields.forEach(assignNullable);
-    if (user.lastSignedIn !== void 0) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== void 0) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = "admin";
-      updateSet.role = "admin";
-    }
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = /* @__PURE__ */ new Date();
-    }
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = /* @__PURE__ */ new Date();
-    }
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet
-    });
-  } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
-    throw error;
-  }
+  return { email: normalizedEmail, status: "subscribed" };
 }
-async function getUserByOpenId(openId) {
+async function listNewsletterSubscribers() {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return void 0;
-  }
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-  return result.length > 0 ? result[0] : void 0;
+  if (!db) throw new Error("The Panco newsletter list is not configured yet.");
+  return db.select().from(newsletterSubscribers).orderBy(desc2(newsletterSubscribers.consentedAt));
+}
+async function unsubscribeNewsletter(email) {
+  const db = await getDb();
+  if (!db) throw new Error("The Panco newsletter list is not configured yet.");
+  const normalizedEmail = normalizeNewsletterEmail(email);
+  await db.update(newsletterSubscribers).set({ status: "unsubscribed", unsubscribedAt: /* @__PURE__ */ new Date() }).where(eq4(newsletterSubscribers.email, normalizedEmail));
+  return { email: normalizedEmail, status: "unsubscribed" };
 }
 
-// server/catalogStore.ts
-var parseArray = (value, fallback) => {
-  try {
-    const result = JSON.parse(value);
-    return Array.isArray(result) ? result : fallback;
-  } catch {
-    return fallback;
-  }
-};
-var mapCatalogItem = (item) => ({
-  id: item.id,
-  slug: item.slug,
-  name: item.name,
-  category: item.category,
-  price: item.price,
-  was: item.was ?? void 0,
-  image: item.image,
-  gallery: parseArray(item.galleryJson, [item.image]),
-  swatches: parseArray(item.swatchesJson, []),
-  colors: parseArray(item.colorsJson, []),
-  tag: item.tag ?? void 0,
-  description: item.description,
-  highlights: parseArray(item.highlightsJson, []),
-  published: item.published,
-  displayOrder: item.displayOrder
+// server/newsletterValidation.ts
+import { z } from "zod";
+var newsletterSubscribeInput = z.object({
+  email: z.string().trim().email().max(320),
+  consent: z.literal(true)
 });
-var toValues = (item) => ({
-  slug: item.slug,
-  name: item.name,
-  category: item.category,
-  price: item.price,
-  was: item.was ?? null,
-  image: item.image,
-  galleryJson: JSON.stringify(item.gallery),
-  swatchesJson: JSON.stringify(item.swatches),
-  colorsJson: JSON.stringify(item.colors),
-  tag: item.tag ?? null,
-  description: item.description,
-  highlightsJson: JSON.stringify(item.highlights),
-  published: item.published,
-  displayOrder: item.displayOrder
+var newsletterEmailInput = z.object({
+  email: z.string().trim().email().max(320)
 });
-async function listCatalogItems(publicOnly = false) {
-  const db = await getDb();
-  if (!db) return [];
-  const rows = publicOnly ? await db.select().from(catalogItems).where(eq2(catalogItems.published, true)).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt)) : await db.select().from(catalogItems).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt));
-  return rows.map(mapCatalogItem);
-}
-async function createCatalogItem(input) {
-  const db = await getDb();
-  if (!db) throw new Error("Catalog database is unavailable.");
-  await db.insert(catalogItems).values(toValues(input));
-  const [created] = await db.select().from(catalogItems).where(eq2(catalogItems.slug, input.slug)).limit(1);
-  if (!created) throw new Error("Catalog item could not be created.");
-  return mapCatalogItem(created);
-}
-async function updateCatalogItem(id, input) {
-  const db = await getDb();
-  if (!db) throw new Error("Catalog database is unavailable.");
-  await db.update(catalogItems).set(toValues(input)).where(eq2(catalogItems.id, id));
-  const [updated] = await db.select().from(catalogItems).where(eq2(catalogItems.id, id)).limit(1);
-  if (!updated) throw new Error("Catalog item could not be updated.");
-  return mapCatalogItem(updated);
-}
-async function deleteCatalogItem(id) {
-  const db = await getDb();
-  if (!db) throw new Error("Catalog database is unavailable.");
-  await db.delete(catalogItems).where(eq2(catalogItems.id, id));
-}
-async function seedCatalogItems(items) {
-  const db = await getDb();
-  if (!db) throw new Error("Catalog database is unavailable.");
-  const [existing] = await db.select({ count: catalogItems.id }).from(catalogItems).limit(1);
-  if (existing?.count) return listCatalogItems();
-  await db.insert(catalogItems).values(items.map(toValues));
-  return listCatalogItems();
-}
-
-// server/catalogDefaults.ts
-var cardholder = "/manus-storage/north-atelier-cardholder_12ba7095.jpg";
-var tote = "/manus-storage/north-atelier-tote_a6b855c4.jpg";
-var weekender = "/manus-storage/north-atelier-weekender_e238bcf4.webp";
-var hero = "/manus-storage/north-atelier-hero_6fac9d50.jpg";
-var workshop = "/manus-storage/north-atelier-workshop_151c4843.jpg";
-var initialCatalogItems = [
-  { slug: "atlas-card-wallet", name: "Atlas Card Wallet", category: "Small leather goods", price: "$78", was: "$92", image: cardholder, gallery: [cardholder, cardholder, cardholder], swatches: ["#66363f", "#352a2a"], colors: [{ name: "Oxblood", color: "#66363f", image: cardholder }, { name: "Night brown", color: "#352a2a", image: cardholder }], tag: "New", description: "A compact wallet cut for the cards, cash, and small routines that stay closest. Light in the hand, softly structured, and finished to improve with use.", highlights: ["Four card slots with a folded bill pocket", "Vegetable-tanned full-grain leather", "Hand-burnished edges and saddle stitching", "Small enough for front-pocket carry"], published: true, displayOrder: 1 },
-  { slug: "morrow-tote", name: "Morrow Tote", category: "Daily carry", price: "$248", image: tote, gallery: [tote, workshop, hero], swatches: ["#A45F3D", "#8A593C"], colors: [{ name: "Saddle", color: "#A45F3D", image: tote }, { name: "Umber", color: "#8A593C", image: hero }], description: "A generous everyday tote balanced between soft proportion and uncomplicated utility. Built for a notebook, a layer, and the objects that make a day work.", highlights: ["Magnetic top closure", "Interior hanging pocket", "Comfortable shoulder straps", "Solid brass hardware"], published: true, displayOrder: 2 },
-  { slug: "rook-field-bag", name: "Rook Field Bag", category: "Shoulder bag", price: "$186", was: "$214", image: weekender, gallery: [weekender, workshop, cardholder], swatches: ["#A55E33", "#633B22"], colors: [{ name: "Cedar", color: "#A55E33", image: weekender }, { name: "Chestnut", color: "#633B22", image: cardholder }], tag: "Studio edit", description: "A field-sized bag for the things that should be within reach. Its compact silhouette carries the small architecture of a day without asking for attention.", highlights: ["Adjustable shoulder strap", "Front utility pocket", "Soft-lined interior", "Made in a limited workshop run"], published: true, displayOrder: 3 },
-  { slug: "long-mile-duffle", name: "Long Mile Duffle", category: "Weekend carry", price: "$320", image: hero, gallery: [hero, workshop, tote], swatches: ["#6D3D24", "#352B22"], colors: [{ name: "Oxhide", color: "#6D3D24", image: hero }, { name: "Dark umber", color: "#352B22", image: tote }], description: "A soft-sided duffle for one good night away or a few days beyond the familiar. Balanced carry, durable zips, and a shape that gets better with every trip.", highlights: ["Wide zip opening", "Removable shoulder strap", "Reinforced leather base", "Cabin-ready proportions"], published: true, displayOrder: 4 }
-];
 
 // server/orderReference.ts
 function createCashOnDeliveryReference(timestamp2 = Date.now(), uuid = crypto.randomUUID()) {
   return `PA-${timestamp2.toString(36).toUpperCase()}-${uuid.slice(0, 4).toUpperCase()}`;
 }
 
-// server/announcementStore.ts
-import { eq as eq3 } from "drizzle-orm";
-var defaultAnnouncementConfig = {
-  enabled: true,
-  messages: ["Cash on Delivery available", "Hand-finished leather goods", "Panco / measured objects"],
-  backgroundColor: "#18362a",
-  textColor: "#f6f5f2",
-  fontStyle: "mono",
-  rotationSeconds: 4
-};
-var parseMessages = (value) => {
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string" && item.trim().length > 0) : [];
-  } catch {
-    return [];
-  }
-};
-async function getAnnouncementConfig() {
-  const db = await getDb();
-  if (!db) return defaultAnnouncementConfig;
-  const [row] = await db.select().from(announcementSettings).where(eq3(announcementSettings.id, 1)).limit(1);
-  if (!row) return defaultAnnouncementConfig;
-  return { enabled: row.enabled, messages: parseMessages(row.messagesJson).slice(0, 12), backgroundColor: row.backgroundColor, textColor: row.textColor, fontStyle: row.fontStyle, rotationSeconds: row.rotationSeconds };
-}
-async function saveAnnouncementConfig(config) {
-  const db = await getDb();
-  if (!db) throw new Error("Announcement settings database is unavailable.");
-  const values = { id: 1, enabled: config.enabled, messagesJson: JSON.stringify(config.messages), backgroundColor: config.backgroundColor, textColor: config.textColor, fontStyle: config.fontStyle, rotationSeconds: config.rotationSeconds };
-  await db.insert(announcementSettings).values(values).onDuplicateKeyUpdate({ set: values });
-  return getAnnouncementConfig();
-}
+// shared/const.ts
+var ONE_YEAR_MS = 1e3 * 60 * 60 * 24 * 365;
+var NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
+
+// server/_core/trpc.ts
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+var t = initTRPC.context().create({
+  transformer: superjson
+});
+var router = t.router;
+var publicProcedure = t.procedure;
+var adminProcedure = t.procedure.use(
+  t.middleware(async (opts) => {
+    const { ctx, next } = opts;
+    if (!ctx.isAdmin) {
+      throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
+    }
+    return next({ ctx });
+  })
+);
 
 // server/routers.ts
 var catalogInput = z2.object({
@@ -681,77 +622,52 @@ var announcementInput = z2.object({
   rotationSeconds: z2.number().int().min(2).max(20)
 });
 var appRouter = router({
-  // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
-  system: systemRouter,
-  auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+  adminAuth: router({
+    status: publicProcedure.query(({ ctx }) => ({ configured: isAdminConfigured(), configuration: getAdminConfigurationStatus(), signedIn: ctx.isAdmin, email: ctx.admin?.email ?? null })),
+    login: publicProcedure.input(z2.object({ email: z2.string().trim().email().max(320), password: z2.string().min(1).max(128) })).mutation(async ({ ctx, input }) => {
+      if (!isAdminConfigured()) throw new TRPCError2({ code: "PRECONDITION_FAILED", message: "Owner sign-in is not configured in Vercel yet." });
+      if (!verifyAdminCredentials(input.email, input.password)) throw new TRPCError2({ code: "UNAUTHORIZED", message: "The email or password is incorrect." });
+      await setAdminSession(ctx.res, ctx.req, input.email);
+      return { success: true };
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true
-      };
+      clearAdminSession(ctx.res, ctx.req);
+      return { success: true };
     })
   }),
   orders: router({
-    submitCashOnDelivery: publicProcedure.input(
-      z2.object({
-        productName: z2.string().min(1).max(120),
-        productPrice: z2.string().min(1).max(32),
-        productImageUrl: z2.string().url().max(2e3),
-        color: z2.string().min(1).max(80),
-        quantity: z2.number().int().min(1).max(9),
-        customerName: z2.string().trim().min(2).max(120),
-        phone: z2.string().trim().min(6).max(40),
-        address: z2.string().trim().min(6).max(240),
-        city: z2.string().trim().min(2).max(100),
-        note: z2.string().trim().max(500).optional()
-      })
-    ).mutation(async ({ input }) => {
+    submitCashOnDelivery: publicProcedure.input(z2.object({ productName: z2.string().min(1).max(120), productPrice: z2.string().min(1).max(32), productImageUrl: z2.string().url().max(2e3), color: z2.string().min(1).max(80), quantity: z2.number().int().min(1).max(9), customerName: z2.string().trim().min(2).max(120), phone: z2.string().trim().min(6).max(40), address: z2.string().trim().min(6).max(240), city: z2.string().trim().min(2).max(100), note: z2.string().trim().max(500).optional() })).mutation(async ({ input }) => {
       const orderReference = createCashOnDeliveryReference();
       try {
         const notifications = await sendOrderNotifications({ ...input, orderReference });
-        if (notifications.email !== "sent") {
-          throw new TRPCError3({
-            code: "PRECONDITION_FAILED",
-            message: "The order desk is not configured yet. Please try again shortly."
-          });
-        }
+        if (notifications.email !== "sent") throw new TRPCError2({ code: "PRECONDITION_FAILED", message: "The order desk is not configured yet. Please try again shortly." });
         return { success: true, orderReference, whatsappSent: notifications.whatsapp === "sent" };
       } catch (error) {
-        if (error instanceof TRPCError3) throw error;
+        if (error instanceof TRPCError2) throw error;
         console.error("[COD order notification]", error);
-        throw new TRPCError3({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "We could not send your request. Please try again shortly."
-        });
+        throw new TRPCError2({ code: "INTERNAL_SERVER_ERROR", message: "We could not send your request. Please try again shortly." });
       }
     })
   }),
   contact: router({
-    submit: publicProcedure.input(z2.object({
-      customerName: z2.string().trim().min(2).max(120),
-      email: z2.string().trim().email().max(240),
-      topic: z2.string().trim().min(2).max(120),
-      message: z2.string().trim().min(8).max(3e3)
-    })).mutation(async ({ input }) => {
+    submit: publicProcedure.input(z2.object({ customerName: z2.string().trim().min(2).max(120), email: z2.string().trim().email().max(240), topic: z2.string().trim().min(2).max(120), message: z2.string().trim().min(8).max(3e3) })).mutation(async ({ input }) => {
       try {
         const notifications = await sendContactNotifications(input);
-        if (notifications.email !== "sent" && notifications.telegram !== "sent") {
-          throw new TRPCError3({ code: "PRECONDITION_FAILED", message: "The Panco contact desk is not configured yet. Please try again shortly." });
-        }
+        if (notifications.email !== "sent" && notifications.telegram !== "sent") throw new TRPCError2({ code: "PRECONDITION_FAILED", message: "The Panco contact desk is not configured yet. Please try again shortly." });
         return { success: true };
       } catch (error) {
-        if (error instanceof TRPCError3) throw error;
+        if (error instanceof TRPCError2) throw error;
         console.error("[Panco contact notification]", error);
-        throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "We could not send your message. Please try again shortly." });
+        throw new TRPCError2({ code: "INTERNAL_SERVER_ERROR", message: "We could not send your message. Please try again shortly." });
       }
     })
   }),
-  announcements: router({
-    publicConfig: publicProcedure.query(() => getAnnouncementConfig()),
-    update: adminProcedure.input(announcementInput).mutation(({ input }) => saveAnnouncementConfig(input))
+  newsletter: router({
+    subscribe: publicProcedure.input(newsletterSubscribeInput).mutation(({ input }) => subscribeToNewsletter(input.email)),
+    adminList: adminProcedure.query(() => listNewsletterSubscribers()),
+    adminUnsubscribe: adminProcedure.input(newsletterEmailInput).mutation(({ input }) => unsubscribeNewsletter(input.email))
   }),
+  announcements: router({ publicConfig: publicProcedure.query(() => getAnnouncementConfig()), update: adminProcedure.input(announcementInput).mutation(({ input }) => saveAnnouncementConfig(input)) }),
   catalog: router({
     publicList: publicProcedure.query(() => listCatalogItems(true)),
     adminList: adminProcedure.query(() => listCatalogItems(false)),
@@ -760,340 +676,23 @@ var appRouter = router({
     remove: adminProcedure.input(z2.object({ id: z2.number().int().positive() })).mutation(({ input }) => deleteCatalogItem(input.id)),
     importCurrentCatalog: adminProcedure.mutation(() => seedCatalogItems(initialCatalogItems))
   })
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
 });
-
-// shared/_core/errors.ts
-var HttpError = class extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = "HttpError";
-  }
-};
-var ForbiddenError = (msg) => new HttpError(403, msg);
-
-// server/_core/sdk.ts
-import axios from "axios";
-import { parse as parseCookieHeader } from "cookie";
-import { SignJWT, jwtVerify } from "jose";
-var isNonEmptyString2 = (value) => typeof value === "string" && value.length > 0;
-var EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
-var GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
-var GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
-var OAuthService = class {
-  constructor(client) {
-    this.client = client;
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
-    if (!ENV.oAuthServerUrl) {
-      console.error(
-        "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
-      );
-    }
-  }
-  decodeState(state) {
-    return decodeOAuthState(state).redirectUri;
-  }
-  async getTokenByCode(code, state) {
-    const payload = {
-      clientId: ENV.appId,
-      grantType: "authorization_code",
-      code,
-      redirectUri: this.decodeState(state)
-    };
-    const { data } = await this.client.post(
-      EXCHANGE_TOKEN_PATH,
-      payload
-    );
-    return data;
-  }
-  async getUserInfoByToken(token) {
-    const { data } = await this.client.post(
-      GET_USER_INFO_PATH,
-      {
-        accessToken: token.accessToken
-      }
-    );
-    return data;
-  }
-};
-var createOAuthHttpClient = () => axios.create({
-  baseURL: ENV.oAuthServerUrl,
-  timeout: AXIOS_TIMEOUT_MS
-});
-var SDKServer = class {
-  client;
-  oauthService;
-  constructor(client = createOAuthHttpClient()) {
-    this.client = client;
-    this.oauthService = new OAuthService(this.client);
-  }
-  deriveLoginMethod(platforms, fallback) {
-    if (fallback && fallback.length > 0) return fallback;
-    if (!Array.isArray(platforms) || platforms.length === 0) return null;
-    const set = new Set(
-      platforms.filter((p) => typeof p === "string")
-    );
-    if (set.has("REGISTERED_PLATFORM_EMAIL")) return "email";
-    if (set.has("REGISTERED_PLATFORM_GOOGLE")) return "google";
-    if (set.has("REGISTERED_PLATFORM_APPLE")) return "apple";
-    if (set.has("REGISTERED_PLATFORM_MICROSOFT") || set.has("REGISTERED_PLATFORM_AZURE"))
-      return "microsoft";
-    if (set.has("REGISTERED_PLATFORM_GITHUB")) return "github";
-    const first = Array.from(set)[0];
-    return first ? first.toLowerCase() : null;
-  }
-  /**
-   * Exchange OAuth authorization code for access token
-   * @example
-   * const tokenResponse = await sdk.exchangeCodeForToken(code, state);
-   */
-  async exchangeCodeForToken(code, state) {
-    return this.oauthService.getTokenByCode(code, state);
-  }
-  /**
-   * Get user information using access token
-   * @example
-   * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
-   */
-  async getUserInfo(accessToken) {
-    const data = await this.oauthService.getUserInfoByToken({
-      accessToken
-    });
-    const loginMethod = this.deriveLoginMethod(
-      data?.platforms,
-      data?.platform ?? data.platform ?? null
-    );
-    return {
-      ...data,
-      platform: loginMethod,
-      loginMethod
-    };
-  }
-  parseCookies(cookieHeader) {
-    if (!cookieHeader) {
-      return /* @__PURE__ */ new Map();
-    }
-    const parsed = parseCookieHeader(cookieHeader);
-    return new Map(Object.entries(parsed));
-  }
-  getSessionSecret() {
-    const secret = ENV.cookieSecret;
-    return new TextEncoder().encode(secret);
-  }
-  /**
-   * Create a session token for a Manus user openId
-   * @example
-   * const sessionToken = await sdk.createSessionToken(userInfo.openId);
-   */
-  async createSessionToken(openId, options = {}) {
-    return this.signSession(
-      {
-        openId,
-        appId: ENV.appId,
-        name: options.name || ""
-      },
-      options
-    );
-  }
-  async signSession(payload, options = {}) {
-    const issuedAt = Date.now();
-    const expiresInMs = options.expiresInMs ?? ONE_YEAR_MS;
-    const expirationSeconds = Math.floor((issuedAt + expiresInMs) / 1e3);
-    const secretKey = this.getSessionSecret();
-    return new SignJWT({
-      openId: payload.openId,
-      appId: payload.appId,
-      name: payload.name
-    }).setProtectedHeader({ alg: "HS256", typ: "JWT" }).setExpirationTime(expirationSeconds).sign(secretKey);
-  }
-  async verifySession(cookieValue) {
-    if (!cookieValue) {
-      console.warn("[Auth] Missing session cookie");
-      return null;
-    }
-    try {
-      const secretKey = this.getSessionSecret();
-      const { payload } = await jwtVerify(cookieValue, secretKey, {
-        algorithms: ["HS256"]
-      });
-      const { openId, appId, name } = payload;
-      if (!isNonEmptyString2(openId) || !isNonEmptyString2(appId) || !isNonEmptyString2(name)) {
-        console.warn("[Auth] Session payload missing required fields");
-        return null;
-      }
-      return {
-        openId,
-        appId,
-        name
-      };
-    } catch (error) {
-      console.warn("[Auth] Session verification failed", String(error));
-      return null;
-    }
-  }
-  async getUserInfoWithJwt(jwtToken) {
-    const payload = {
-      jwtToken,
-      projectId: ENV.appId
-    };
-    const { data } = await this.client.post(
-      GET_USER_INFO_WITH_JWT_PATH,
-      payload
-    );
-    const loginMethod = this.deriveLoginMethod(
-      data?.platforms,
-      data?.platform ?? data.platform ?? null
-    );
-    return {
-      ...data,
-      platform: loginMethod,
-      loginMethod
-    };
-  }
-  async authenticateRequest(req) {
-    const cookies = this.parseCookies(req.headers.cookie);
-    let sessionToken = cookies.get(COOKIE_NAME);
-    if (!sessionToken) {
-      const authHeader = req.headers.authorization;
-      if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
-        sessionToken = authHeader.slice(7);
-      }
-    }
-    const session = await this.verifySession(sessionToken);
-    if (!session) {
-      throw ForbiddenError("Invalid session cookie");
-    }
-    if (session.openId.startsWith(CRON_OPEN_ID_PREFIX)) {
-      const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
-      const taskUid = userInfo.taskUid ?? null;
-      if (!taskUid) {
-        throw ForbiddenError("Cron session missing task_uid");
-      }
-      return buildCronUser(userInfo);
-    }
-    const sessionUserId = session.openId;
-    const signedInAt = /* @__PURE__ */ new Date();
-    let user = await getUserByOpenId(sessionUserId);
-    if (!user) {
-      try {
-        const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
-        await upsertUser({
-          openId: userInfo.openId,
-          name: userInfo.name || null,
-          email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-          lastSignedIn: signedInAt
-        });
-        user = await getUserByOpenId(userInfo.openId);
-      } catch (error) {
-        console.error("[Auth] Failed to sync user from OAuth:", error);
-        throw ForbiddenError("Failed to sync user info");
-      }
-    }
-    if (!user) {
-      throw ForbiddenError("User not found");
-    }
-    await upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt
-    });
-    return user;
-  }
-};
-var CRON_OPEN_ID_PREFIX = "cron_";
-function buildCronUser(userInfo) {
-  const now = /* @__PURE__ */ new Date();
-  return {
-    id: -1,
-    openId: userInfo.openId,
-    name: userInfo.name || "Manus Scheduled Task",
-    email: null,
-    loginMethod: null,
-    role: "user",
-    createdAt: now,
-    updatedAt: now,
-    lastSignedIn: now,
-    taskUid: userInfo.taskUid ?? void 0,
-    isCron: true
-  };
-}
-var sdk = new SDKServer();
 
 // server/_core/context.ts
 async function createContext(opts) {
-  let user = null;
-  try {
-    user = await sdk.authenticateRequest(opts.req);
-  } catch (error) {
-    user = null;
-  }
+  const admin = await getAdminSession(opts.req);
   return {
     req: opts.req,
     res: opts.res,
-    user
+    admin,
+    isAdmin: Boolean(admin)
   };
-}
-
-// server/_core/oauth.ts
-import { parse as parseCookieHeader2 } from "cookie";
-function getQueryParam(req, key) {
-  const value = req.query[key];
-  return typeof value === "string" ? value : void 0;
-}
-function registerOAuthRoutes(app2) {
-  app2.get("/api/oauth/callback", async (req, res) => {
-    const code = getQueryParam(req, "code");
-    const state = getQueryParam(req, "state");
-    if (!code || !state) {
-      res.status(400).json({ error: "code and state are required" });
-      return;
-    }
-    const { nonce } = decodeOAuthState(state);
-    const expectedNonce = parseCookieHeader2(req.headers.cookie ?? "")[OAUTH_STATE_COOKIE];
-    if (!nonce || nonce !== expectedNonce) {
-      res.status(403).json({ error: "invalid oauth state" });
-      return;
-    }
-    res.clearCookie(OAUTH_STATE_COOKIE, { path: "/", secure: true, sameSite: "none" });
-    try {
-      const tokenResponse = await sdk.exchangeCodeForToken(code, state);
-      const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
-      if (!userInfo.openId) {
-        res.status(400).json({ error: "openId missing from user info" });
-        return;
-      }
-      await upsertUser({
-        openId: userInfo.openId,
-        name: userInfo.name || null,
-        email: userInfo.email ?? null,
-        loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-        lastSignedIn: /* @__PURE__ */ new Date()
-      });
-      const sessionToken = await sdk.createSessionToken(userInfo.openId, {
-        name: userInfo.name || "",
-        expiresInMs: ONE_YEAR_MS
-      });
-      const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-      res.redirect(302, "/");
-    } catch (error) {
-      console.error("[OAuth] Callback failed", error);
-      res.status(500).json({ error: "OAuth callback failed" });
-    }
-  });
 }
 
 // server/vercelApiApp.ts
 var app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-registerOAuthRoutes(app);
 app.use(
   "/api/trpc",
   createExpressMiddleware({
