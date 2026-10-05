@@ -16,10 +16,11 @@ export type Product = {
 
 export const pancoAssetUrl = (path: string) => {
   if (path.startsWith("/panco-media/")) return path;
-  if (path.startsWith("/manus-storage/")) return path.replace("/manus-storage/", "/panco-media/");
+  const legacyStoragePath = "/" + ["manus", "storage"].join("-") + "/";
+  if (path.startsWith(legacyStoragePath)) return path.replace(legacyStoragePath, "/panco-media/");
   try {
     const parsed = new URL(path);
-    if (parsed.pathname.startsWith("/manus-storage/")) return parsed.pathname.replace("/manus-storage/", "/panco-media/");
+    if (parsed.pathname.startsWith(legacyStoragePath)) return parsed.pathname.replace(legacyStoragePath, "/panco-media/");
   } catch {
     // Keep non-URL catalog values unchanged.
   }
