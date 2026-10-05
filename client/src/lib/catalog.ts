@@ -17,8 +17,12 @@ export type Product = {
 export const pancoAssetUrl = (path: string) => {
   if (path.startsWith("/panco-media/")) return path;
   if (path.startsWith("/manus-storage/")) return path.replace("/manus-storage/", "/panco-media/");
-  const legacyPrefix = "https://northshop-zgmh8cdf.manus.space/manus-storage/";
-  if (path.startsWith(legacyPrefix)) return `/panco-media/${path.slice(legacyPrefix.length)}`;
+  try {
+    const parsed = new URL(path);
+    if (parsed.pathname.startsWith("/manus-storage/")) return parsed.pathname.replace("/manus-storage/", "/panco-media/");
+  } catch {
+    // Keep non-URL catalog values unchanged.
+  }
   return path;
 };
 
