@@ -1,10 +1,10 @@
 import type { CatalogInput } from "./catalogStore";
 
-const cardholder = "/manus-storage/north-atelier-cardholder_12ba7095.jpg";
-const tote = "/manus-storage/north-atelier-tote_a6b855c4.jpg";
-const weekender = "/manus-storage/north-atelier-weekender_e238bcf4.webp";
-const hero = "/manus-storage/north-atelier-hero_6fac9d50.jpg";
-const workshop = "/manus-storage/north-atelier-workshop_151c4843.jpg";
+const cardholder = "/panco-media/north-atelier-cardholder_12ba7095.jpg";
+const tote = "/panco-media/north-atelier-tote_a6b855c4.jpg";
+const weekender = "/panco-media/north-atelier-weekender_e238bcf4.webp";
+const hero = "/panco-media/north-atelier-hero_6fac9d50.jpg";
+const workshop = "/panco-media/north-atelier-workshop_151c4843.jpg";
 
 export const initialCatalogItems: CatalogInput[] = [
   { slug: "atlas-card-wallet", name: "Atlas Card Wallet", category: "Small leather goods", price: "$78", was: "$92", image: cardholder, gallery: [cardholder, cardholder, cardholder], swatches: ["#66363f", "#352a2a"], colors: [{ name: "Oxblood", color: "#66363f", image: cardholder }, { name: "Night brown", color: "#352a2a", image: cardholder }], tag: "New", description: "A compact wallet cut for the cards, cash, and small routines that stay closest. Light in the hand, softly structured, and finished to improve with use.", highlights: ["Four card slots with a folded bill pocket", "Vegetable-tanned full-grain leather", "Hand-burnished edges and saddle stitching", "Small enough for front-pocket carry"], published: true, displayOrder: 1 },

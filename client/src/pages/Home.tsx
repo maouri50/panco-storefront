@@ -36,44 +36,44 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 /** EDITABLE CONTENT: original campaign slides for the hero carousel. */
 const heroSlides = [
   {
-    image: pancoAssetUrl("/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg"),
+    image: pancoAssetUrl("/panco-media/panco-long-mile-duffle-hero_3cb326bc.jpg"),
     align: "hero-content--left",
   },
   {
-    image: pancoAssetUrl("/manus-storage/north-atelier-tote_a6b855c4.jpg"),
+    image: pancoAssetUrl("/panco-media/north-atelier-tote_a6b855c4.jpg"),
     align: "hero-content--right",
   },
   {
-    image: pancoAssetUrl("/manus-storage/north-atelier-workshop_151c4843.jpg"),
+    image: pancoAssetUrl("/panco-media/north-atelier-workshop_151c4843.jpg"),
     align: "hero-content--left",
   },
 ];
 
 const collections = [
-  { number: "01", title: "Daily companions", description: "For every open door.", image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg" },
-  { number: "02", title: "Travel notes", description: "Room for the long way.", image: "/manus-storage/north-atelier-hero_6fac9d50.jpg" },
-  { number: "03", title: "Carried close", description: "Small goods with presence.", image: "/manus-storage/north-atelier-weekender_e238bcf4.webp" },
-  { number: "04", title: "Desk objects", description: "Purpose in the quiet details.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
-  { number: "05", title: "Gift ledger", description: "Good things to give well.", image: "/manus-storage/north-atelier-tote_a6b855c4.jpg" },
-  { number: "06", title: "Care & repair", description: "Built to stay in motion.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
+  { number: "01", title: "Daily companions", description: "For every open door.", image: "/panco-media/north-atelier-cardholder_12ba7095.jpg" },
+  { number: "02", title: "Travel notes", description: "Room for the long way.", image: "/panco-media/north-atelier-hero_6fac9d50.jpg" },
+  { number: "03", title: "Carried close", description: "Small goods with presence.", image: "/panco-media/north-atelier-weekender_e238bcf4.webp" },
+  { number: "04", title: "Desk objects", description: "Purpose in the quiet details.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
+  { number: "05", title: "Gift ledger", description: "Good things to give well.", image: "/panco-media/north-atelier-tote_a6b855c4.jpg" },
+  { number: "06", title: "Care & repair", description: "Built to stay in motion.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
 ];
 
 const arabicCollections = [
-  { number: "01", title: "رفقاء اليوم", description: "لكل بابٍ مفتوح.", image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg" },
-  { number: "02", title: "ملاحظات السفر", description: "مساحة للطريق الطويل.", image: "/manus-storage/north-atelier-hero_6fac9d50.jpg" },
-  { number: "03", title: "قريباً منك", description: "قطع صغيرة بحضور هادئ.", image: "/manus-storage/north-atelier-weekender_e238bcf4.webp" },
-  { number: "04", title: "قطع المكتب", description: "غاية في التفاصيل الهادئة.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
-  { number: "05", title: "سجل الهدايا", description: "أشياء جميلة تُهدى بعناية.", image: "/manus-storage/north-atelier-tote_a6b855c4.jpg" },
-  { number: "06", title: "العناية والإصلاح", description: "مصنوعة لتبقى في الحركة.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
+  { number: "01", title: "رفقاء اليوم", description: "لكل بابٍ مفتوح.", image: "/panco-media/north-atelier-cardholder_12ba7095.jpg" },
+  { number: "02", title: "ملاحظات السفر", description: "مساحة للطريق الطويل.", image: "/panco-media/north-atelier-hero_6fac9d50.jpg" },
+  { number: "03", title: "قريباً منك", description: "قطع صغيرة بحضور هادئ.", image: "/panco-media/north-atelier-weekender_e238bcf4.webp" },
+  { number: "04", title: "قطع المكتب", description: "غاية في التفاصيل الهادئة.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
+  { number: "05", title: "سجل الهدايا", description: "أشياء جميلة تُهدى بعناية.", image: "/panco-media/north-atelier-tote_a6b855c4.jpg" },
+  { number: "06", title: "العناية والإصلاح", description: "مصنوعة لتبقى في الحركة.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
 ];
 
 const frenchCollections = [
-  { number: "01", title: "Compagnons du quotidien", description: "Pour chaque porte ouverte.", image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg" },
-  { number: "02", title: "Notes de voyage", description: "De la place pour le long chemin.", image: "/manus-storage/north-atelier-hero_6fac9d50.jpg" },
-  { number: "03", title: "Porté près de soi", description: "Petite maroquinerie, grande présence.", image: "/manus-storage/north-atelier-weekender_e238bcf4.webp" },
-  { number: "04", title: "Objets de bureau", description: "Du sens dans les détails calmes.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
-  { number: "05", title: "Registre des cadeaux", description: "De belles choses à offrir avec soin.", image: "/manus-storage/north-atelier-tote_a6b855c4.jpg" },
-  { number: "06", title: "Soin et réparation", description: "Faits pour rester en mouvement.", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
+  { number: "01", title: "Compagnons du quotidien", description: "Pour chaque porte ouverte.", image: "/panco-media/north-atelier-cardholder_12ba7095.jpg" },
+  { number: "02", title: "Notes de voyage", description: "De la place pour le long chemin.", image: "/panco-media/north-atelier-hero_6fac9d50.jpg" },
+  { number: "03", title: "Porté près de soi", description: "Petite maroquinerie, grande présence.", image: "/panco-media/north-atelier-weekender_e238bcf4.webp" },
+  { number: "04", title: "Objets de bureau", description: "Du sens dans les détails calmes.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
+  { number: "05", title: "Registre des cadeaux", description: "De belles choses à offrir avec soin.", image: "/panco-media/north-atelier-tote_a6b855c4.jpg" },
+  { number: "06", title: "Soin et réparation", description: "Faits pour rester en mouvement.", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
 ];
 
 const faqItems = [
@@ -309,7 +309,7 @@ export default function Home() {
         </section>
 
         <section id="story" className="craft-section">
-          <div className="craft-section__image"><img src="/manus-storage/north-atelier-workshop_151c4843.jpg" alt={isArabic ? "حرفي يخيط قطعة جلدية باليد" : isFrench ? "Artisan cousant une pièce en cuir à la main" : "Artisan stitching a leather piece by hand"} /><span>{isArabic ? "بانكو / دراسة مادة رقم 05" : isFrench ? "Panco / Étude matière no 05" : "Panco / Material study no. 05"}</span></div>
+          <div className="craft-section__image"><img src="/panco-media/north-atelier-workshop_151c4843.jpg" alt={isArabic ? "حرفي يخيط قطعة جلدية باليد" : isFrench ? "Artisan cousant une pièce en cuir à la main" : "Artisan stitching a leather piece by hand"} /><span>{isArabic ? "بانكو / دراسة مادة رقم 05" : isFrench ? "Panco / Étude matière no 05" : "Panco / Material study no. 05"}</span></div>
           <div className="craft-section__copy">
             <p className="kicker">{isArabic ? "الفن قبل التجارة" : isFrench ? "L’art avant le commerce" : "Art before commerce"}</p>
             <h2>{isArabic ? <>صُنعت ومعها<br /><em>ذاكرة.</em></> : isFrench ? <>Faite avec<br /><em>une mémoire.</em></> : <>Built with<br /><em>a memory.</em></>}</h2>
@@ -327,7 +327,7 @@ export default function Home() {
 
         <section id="journal" className="journal-section">
           <div className="journal-article"><p className="kicker kicker--light">{isArabic ? "من المجلة" : isFrench ? "Depuis le journal" : "From the journal"}</p><h2>{isArabic ? <>لماذا يستحق الجلد<br /><em>هذا الانتظار.</em></> : isFrench ? <>Pourquoi le cuir<br /><em>mérite l’attente.</em></> : <>Why leather is<br /><em>worth the wait.</em></>}</h2><p>{isArabic ? "المواد الطبيعية تحتفظ بحسابها الخاص: كل أثر وتدرج وزاوية ناعمة تصبح دليلاً على الاستعمال." : isFrench ? "Les matières naturelles gardent leur propre trace : chaque marque, nuance et angle adouci devient la preuve de l’usage." : "Natural materials keep their own score: every mark, shade, and softened corner turns into evidence of use."}</p><a href="#top" className="journal-link">{isArabic ? "اقرأ ملاحظة من الميدان" : isFrench ? "Lire la note d’atelier" : "Read field note"} <ArrowRight size={15} /></a></div>
-          <div className="journal-image"><img src="/manus-storage/north-atelier-tote_a6b855c4.jpg" alt={isArabic ? "حقيبة جلدية في مساحة معمارية هادئة" : "Leather tote in a quiet architectural setting"} /><span>{isArabic ? "مجلة 06 / صدق المادة" : "Journal 06 / Material honesty"}</span></div>
+          <div className="journal-image"><img src="/panco-media/north-atelier-tote_a6b855c4.jpg" alt={isArabic ? "حقيبة جلدية في مساحة معمارية هادئة" : "Leather tote in a quiet architectural setting"} /><span>{isArabic ? "مجلة 06 / صدق المادة" : "Journal 06 / Material honesty"}</span></div>
         </section>
 
         <section className="newsletter-section page-section">

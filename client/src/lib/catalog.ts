@@ -14,7 +14,13 @@ export type Product = {
   highlights: string[];
 };
 
-export const pancoAssetUrl = (path: string) => path.startsWith("/manus-storage/") ? `https://northshop-zgmh8cdf.manus.space${path}` : path;
+export const pancoAssetUrl = (path: string) => {
+  if (path.startsWith("/panco-media/")) return path;
+  if (path.startsWith("/manus-storage/")) return path.replace("/manus-storage/", "/panco-media/");
+  const legacyPrefix = "https://northshop-zgmh8cdf.manus.space/manus-storage/";
+  if (path.startsWith(legacyPrefix)) return `/panco-media/${path.slice(legacyPrefix.length)}`;
+  return path;
+};
 
 const rawCatalogProducts: Product[] = [
   {
@@ -23,16 +29,16 @@ const rawCatalogProducts: Product[] = [
     category: "Small leather goods",
     price: "$78",
     was: "$92",
-    image: "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
+    image: "/panco-media/panco-atlas-wallet-angle_284697ca.jpg",
     gallery: [
-      "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg",
-      "/manus-storage/panco-atlas-wallet-interior_26a2cff9.jpg",
-      "/manus-storage/panco-atlas-wallet-editorial-final_26f31ab6.jpg",
+      "/panco-media/panco-atlas-wallet-angle_284697ca.jpg",
+      "/panco-media/panco-atlas-wallet-interior_26a2cff9.jpg",
+      "/panco-media/panco-atlas-wallet-editorial-final_26f31ab6.jpg",
     ],
     swatches: ["#66363f", "#352a2a"],
     colors: [
-      { name: "Oxblood", color: "#66363f", image: "/manus-storage/panco-atlas-wallet-editorial-final_26f31ab6.jpg" },
-      { name: "Night brown", color: "#352a2a", image: "/manus-storage/panco-atlas-wallet-angle_284697ca.jpg" },
+      { name: "Oxblood", color: "#66363f", image: "/panco-media/panco-atlas-wallet-editorial-final_26f31ab6.jpg" },
+      { name: "Night brown", color: "#352a2a", image: "/panco-media/panco-atlas-wallet-angle_284697ca.jpg" },
     ],
     tag: "New",
     description: "A compact wallet cut for the cards, cash, and small routines that stay closest. Light in the hand, softly structured, and finished to improve with use.",
@@ -43,16 +49,16 @@ const rawCatalogProducts: Product[] = [
     name: "Morrow Tote",
     category: "Daily carry",
     price: "$248",
-    image: "/manus-storage/panco-morrow-tote-editorial-final_897513e4.jpg",
+    image: "/panco-media/panco-morrow-tote-editorial-final_897513e4.jpg",
     gallery: [
-      "/manus-storage/panco-morrow-tote-editorial-final_897513e4.jpg",
-      "/manus-storage/north-atelier-workshop_151c4843.jpg",
-      "/manus-storage/north-atelier-hero_6fac9d50.jpg",
+      "/panco-media/panco-morrow-tote-editorial-final_897513e4.jpg",
+      "/panco-media/north-atelier-workshop_151c4843.jpg",
+      "/panco-media/north-atelier-hero_6fac9d50.jpg",
     ],
     swatches: ["#A45F3D", "#8A593C"],
     colors: [
-      { name: "Saddle", color: "#A45F3D", image: "/manus-storage/panco-morrow-tote-editorial-final_897513e4.jpg" },
-      { name: "Umber", color: "#8A593C", image: "/manus-storage/north-atelier-hero_6fac9d50.jpg" },
+      { name: "Saddle", color: "#A45F3D", image: "/panco-media/panco-morrow-tote-editorial-final_897513e4.jpg" },
+      { name: "Umber", color: "#8A593C", image: "/panco-media/north-atelier-hero_6fac9d50.jpg" },
     ],
     description: "A generous everyday tote balanced between soft proportion and uncomplicated utility. Built for a notebook, a layer, and the objects that make a day work.",
     highlights: ["Magnetic top closure", "Interior hanging pocket", "Comfortable shoulder straps", "Solid brass hardware"],
@@ -63,16 +69,16 @@ const rawCatalogProducts: Product[] = [
     category: "Shoulder bag",
     price: "$186",
     was: "$214",
-    image: "/manus-storage/panco-rook-field-bag-editorial-final_4c404ab1.jpg",
+    image: "/panco-media/panco-rook-field-bag-editorial-final_4c404ab1.jpg",
     gallery: [
-      "/manus-storage/panco-rook-field-bag-editorial-final_4c404ab1.jpg",
-      "/manus-storage/north-atelier-workshop_151c4843.jpg",
-      "/manus-storage/north-atelier-cardholder_12ba7095.jpg",
+      "/panco-media/panco-rook-field-bag-editorial-final_4c404ab1.jpg",
+      "/panco-media/north-atelier-workshop_151c4843.jpg",
+      "/panco-media/north-atelier-cardholder_12ba7095.jpg",
     ],
     swatches: ["#A55E33", "#633B22"],
     colors: [
-      { name: "Cedar", color: "#A55E33", image: "/manus-storage/panco-rook-field-bag-editorial-final_4c404ab1.jpg" },
-      { name: "Chestnut", color: "#633B22", image: "/manus-storage/north-atelier-cardholder_12ba7095.jpg" },
+      { name: "Cedar", color: "#A55E33", image: "/panco-media/panco-rook-field-bag-editorial-final_4c404ab1.jpg" },
+      { name: "Chestnut", color: "#633B22", image: "/panco-media/north-atelier-cardholder_12ba7095.jpg" },
     ],
     tag: "Studio edit",
     description: "A field-sized bag for the things that should be within reach. Its compact silhouette carries the small architecture of a day without asking for attention.",
@@ -83,16 +89,16 @@ const rawCatalogProducts: Product[] = [
     name: "Long Mile Duffle",
     category: "Weekend carry",
     price: "$320",
-    image: "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
+    image: "/panco-media/panco-long-mile-duffle-hero_3cb326bc.jpg",
     gallery: [
-      "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg",
-      "/manus-storage/north-atelier-workshop_151c4843.jpg",
-      "/manus-storage/north-atelier-tote_a6b855c4.jpg",
+      "/panco-media/panco-long-mile-duffle-hero_3cb326bc.jpg",
+      "/panco-media/north-atelier-workshop_151c4843.jpg",
+      "/panco-media/north-atelier-tote_a6b855c4.jpg",
     ],
     swatches: ["#6D3D24", "#352B22"],
     colors: [
-      { name: "Oxhide", color: "#6D3D24", image: "/manus-storage/panco-long-mile-duffle-hero_3cb326bc.jpg" },
-      { name: "Dark umber", color: "#352B22", image: "/manus-storage/north-atelier-workshop_151c4843.jpg" },
+      { name: "Oxhide", color: "#6D3D24", image: "/panco-media/panco-long-mile-duffle-hero_3cb326bc.jpg" },
+      { name: "Dark umber", color: "#352B22", image: "/panco-media/north-atelier-workshop_151c4843.jpg" },
     ],
     description: "A soft-sided duffle for one good night away or a few days beyond the familiar. Balanced carry, durable zips, and a shape that gets better with every trip.",
     highlights: ["Wide zip opening", "Removable shoulder strap", "Reinforced leather base", "Cabin-ready proportions"],
