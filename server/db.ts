@@ -2,8 +2,10 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { ensureRuntimeSchema } from "./schemaBootstrap";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _schemaReady: Promise<void> | null = null;
 
 function createDatabase(connectionString: string) {
   const hostname = new URL(connectionString).hostname;
@@ -32,6 +34,14 @@ export async function getDb() {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
     }
+  }
+  if (_db) {
+    _schemaReady ??= ensureRuntimeSchema(_db).catch(error => {
+      _schemaReady = null;
+      console.error("[Database] Failed to ensure runtime schema:", error);
+      throw error;
+    });
+    await _schemaReady;
   }
   return _db;
 }
