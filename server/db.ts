@@ -6,12 +6,16 @@ import { ENV } from './_core/env';
 let _db: ReturnType<typeof drizzle> | null = null;
 
 function createDatabase(connectionString: string) {
-  const hostname = new URL(connectionString).hostname;
+  const connectionUrl = new URL(connectionString);
+  const hostname = connectionUrl.hostname;
 
   if (hostname.endsWith(".tidbcloud.com")) {
+    // TiDB Cloud's connection URL was provisioned with the restricted `sys`
+    // schema. Panco's application schema is the writable `panco` database.
+    connectionUrl.pathname = "/panco";
     return drizzle({
       connection: {
-        uri: connectionString,
+        uri: connectionUrl.toString(),
         ssl: {
           minVersion: "TLSv1.2",
           rejectUnauthorized: true,
