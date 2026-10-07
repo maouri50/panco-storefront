@@ -27,7 +27,21 @@ const announcementInput = z.object({
 
 export const appRouter = router({
   adminAuth: router({
-    status: publicProcedure.query(({ ctx }) => ({ configured: isAdminConfigured(), configuration: getAdminConfigurationStatus(), signedIn: ctx.isAdmin, email: ctx.admin?.email ?? null })),
+    status: publicProcedure.query(({ ctx }) => {
+      let databaseHost: string | null = null;
+      let databaseName: string | null = null;
+      try {
+        const databaseUrl = process.env.DATABASE_URL;
+        if (databaseUrl) {
+          const parsed = new URL(databaseUrl);
+          databaseHost = parsed.hostname;
+          databaseName = parsed.pathname.replace(/^\//, "") || null;
+        }
+      } catch {
+        databaseHost = "invalid-database-url";
+      }
+      return { configured: isAdminConfigured(), configuration: getAdminConfigurationStatus(), signedIn: ctx.isAdmin, email: ctx.admin?.email ?? null, databaseHost, databaseName };
+    }),
     login: publicProcedure.input(z.object({ email: z.string().trim().email().max(320), password: z.string().min(1).max(128) })).mutation(async ({ ctx, input }) => {
       if (!isAdminConfigured()) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Owner sign-in is not configured in Vercel yet." });
       if (!verifyAdminCredentials(input.email, input.password)) throw new TRPCError({ code: "UNAUTHORIZED", message: "The email or password is incorrect." });
