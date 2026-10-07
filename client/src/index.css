@@ -91,7 +91,7 @@ a { color: inherit; text-decoration: none; }
 .panco-logo--dark { color: var(--ink); }
 .panco-logo--mark { gap: 0; }
 
-.hero-carousel { position: relative; height: min(900px, 100svh); min-height: 680px; overflow: hidden; color: #fff; background: var(--night); }
+.hero-carousel { position: relative; height: clamp(460px, 80svh, 720px); min-height: 460px; overflow: hidden; color: #fff; background: var(--night); }
 .hero-carousel__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; animation: hero-fade .7s var(--ease-out); }
 .hero-carousel__wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(35, 22, 15, .82) 0%, rgba(35, 22, 15, .54) 35%, rgba(35, 22, 15, .14) 69%, rgba(35, 22, 15, .08)), linear-gradient(0deg, rgba(35, 22, 15, .44), transparent 38%); }
 .hero-house-stamp { position: absolute; z-index: 3; top: 142px; left: clamp(28px, 5.2vw, 78px); display: grid; grid-template-columns: 38px auto; align-items: center; gap: 10px; padding: 0 0 9px; border-bottom: 1px solid rgba(255,255,255,.52); color: var(--shell); }
@@ -354,7 +354,7 @@ h2 em { font-weight: 400; }
   .panco-logo__mark { width: 25px; height: 25px; }
   .panco-logo__type { font-size: 20px; }
   .house-mark__type i { height: 17px; }
-  .hero-carousel { min-height: 700px; height: 100svh; }
+  .hero-carousel { min-height: 500px; height: min(78svh, 680px); }
   .hero-carousel__image { object-position: 59% center; }
   .hero-carousel__wash { background: linear-gradient(90deg, rgba(7, 10, 9, .64), rgba(7, 10, 9, .14) 80%), linear-gradient(0deg, rgba(7, 10, 9, .48), transparent 42%); }
   .hero-content { top: auto; bottom: 88px; max-width: 90%; transform: none; }
