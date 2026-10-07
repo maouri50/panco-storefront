@@ -107,6 +107,7 @@ export default function Home() {
   const localizedProducts = products.map((product) => localizeProduct(product, locale));
   const isArabic = locale === "ar";
   const isFrench = locale === "fr";
+  const heroCtaLabel = isArabic ? "تسوّق التشكيلة" : isFrench ? "Voir la collection" : "Shop Collection";
   const cashOnDeliveryLabel = isArabic
     ? "الدفع عند الاستلام متاح"
     : isFrench
@@ -201,7 +202,7 @@ export default function Home() {
   return (
     <div className="storefront" dir={direction}>
       <div
-        className={`utility-bar ${scrolled ? "utility-bar--visible" : ""} ${announcement?.enabled === false ? "utility-bar--disabled" : ""}`}
+        className={`utility-bar ${announcement?.enabled === false ? "utility-bar--disabled" : ""}`}
         data-font={announcement?.fontStyle ?? "mono"}
         style={{ "--announcement-bg": announcement?.backgroundColor ?? "#18362a", "--announcement-text": announcement?.textColor ?? "#f6f5f2" } as CSSProperties}
       >
@@ -245,19 +246,15 @@ export default function Home() {
         <section id="hero" className="hero-carousel" aria-label="Featured Panco campaign">
           <img src={slide.image} alt="Panco collection" className="hero-carousel__image" key={slide.image} />
           <div className="hero-carousel__wash" />
-          <div className="hero-house-stamp" aria-hidden="true"><PancoLogo variant="light" markOnly /><div><span>Panco</span><small>Objects / studio ledger</small></div></div>
           <div className={`hero-content ${slide.align}`}>
             <p className="kicker kicker--light">{slide.eyebrow}</p>
             <h1>{slide.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h1>
-            <p className="hero-copy">{slide.note}</p>
-            <a href="#shop" className="hero-cta">{slide.cta} <ArrowRight size={16} /></a>
+            <a href="#shop" className="hero-cta">{heroCtaLabel} <ArrowRight size={16} /></a>
           </div>
           <div className="hero-carousel__footer">
-            <span>01 — Workshop objects</span>
             <div className="hero-pagination" aria-label="Select campaign slide">
             {heroSlides.map((_, index) => <button type="button" aria-label={`View slide ${index + 1}`} className={index === activeSlide ? "is-active" : ""} onClick={() => setActiveSlide(index)} key={index} />)}
             </div>
-            <span>Made in measured runs</span>
           </div>
         </section>
 
