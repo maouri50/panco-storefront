@@ -20,8 +20,8 @@ describe("Locale helpers", () => {
     expect(localizeProduct(catalogProducts[0], "fr").name).toBe("Porte-cartes Atlas");
   });
 
-  it("keeps the requested English shop heading on one line without changing localized editorial breaks", () => {
-    expect(homeCopy.en.everyday).toBe("Objects for the everyday.");
+  it("keeps the requested Last Products heading on one line without changing localized editorial breaks", () => {
+    expect(homeCopy.en.everyday).toBe("Last Products");
     expect(homeCopy.fr.everyday).toContain("\n");
     expect(homeCopy.ar.everyday).toContain("\n");
   });

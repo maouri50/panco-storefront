@@ -272,7 +272,7 @@ export default function Home() {
                 <div className="catalog-card__image">
                   <Link href={`/products/${product.slug}`} className="catalog-card__link"><img src={product.image} alt={product.name} /></Link>
                   <span className="catalog-number">{String(index + 1).padStart(2, "0")}</span>
-                  {product.tag && <span className="catalog-tag">{product.tag}</span>}
+                  {(product.was || product.tag) && <span className="catalog-tag">{product.was ? "SALE" : product.tag}</span>}
                   <button type="button" onClick={() => addToCart(product)} className="card-add">{copy.quickAdd} <Plus size={14} /></button>
                 </div>
                 <div className="catalog-card__meta">
