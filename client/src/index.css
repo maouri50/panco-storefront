@@ -101,16 +101,15 @@ a { color: inherit; text-decoration: none; }
 .hero-house-stamp b { font-family: "Playfair Display", Georgia, serif; font-size: 28px; font-weight: 500; letter-spacing: -.17em; }
 .hero-house-stamp span { font-family: "Playfair Display", Georgia, serif; font-size: 17px; letter-spacing: -.04em; }
 .hero-house-stamp small { grid-column: span 2; margin-top: 1px; text-transform: uppercase; font-size: 6px; letter-spacing: .14em; opacity: .78; }
-.hero-content { position: absolute; z-index: 2; top: 53%; max-width: min(530px, 43vw); transform: translateY(-40%); }
-.hero-content--left { left: clamp(28px, 7.8vw, 118px); }
-.hero-content--right { right: clamp(28px, 8vw, 126px); }
+.hero-content { position: absolute; z-index: 2; top: 57%; left: 50%; right: auto; width: min(530px, 43vw); max-width: none; transform: translate(-50%, -40%); text-align: center; }
+.hero-content--left, .hero-content--right { left: 50%; right: auto; }
 .kicker { margin: 0 0 15px; color: var(--muted); text-transform: uppercase; font-size: 9px; letter-spacing: .18em; line-height: 1.55; }
 .kicker--light { color: rgba(255,255,255,.74); }
 .hero-content h1, .section-heading h2, .collections-intro h2, .craft-section h2, .small-things-copy h2, .journal-article h2, .newsletter-section h2, .faq-intro h2, .checkout-card h2, .order-success h2 { margin: 0; font-family: "Playfair Display", Georgia, serif; font-weight: 400; letter-spacing: -.06em; }
 .hero-content h1 { font-size: clamp(52px, 6.2vw, 94px); line-height: .84; }
 .hero-content h1 span { display: block; }
 .hero-copy { max-width: 355px; margin: 25px 0 30px; font-family: "Playfair Display", Georgia, serif; font-size: 18px; line-height: 1.2; color: rgba(255,255,255,.83); }
-.hero-cta { display: inline-flex; align-items: center; gap: 12px; padding: 16px 19px; background: var(--shell); color: var(--ink); text-transform: uppercase; font-size: 9px; letter-spacing: .15em; transition: background .2s var(--ease-out), color .2s var(--ease-out), gap .2s var(--ease-out), transform .18s var(--ease-out); }
+.hero-cta { display: inline-flex; align-items: center; gap: 12px; margin: 22px auto 0; padding: 16px 30px; background: var(--shell); color: var(--ink); text-transform: uppercase; font-size: 9px; letter-spacing: .2em; transition: background .2s var(--ease-out), color .2s var(--ease-out), gap .2s var(--ease-out), transform .18s var(--ease-out); }
 .hero-cta:hover { gap: 18px; background: var(--cloud); }
 .hero-carousel__footer { position: absolute; z-index: 3; bottom: 25px; left: clamp(28px, 4.8vw, 76px); right: clamp(28px, 4.8vw, 76px); display: flex; justify-content: center; align-items: center; color: rgba(255,255,255,.75); text-transform: uppercase; font-size: 8px; letter-spacing: .14em; }
 .hero-carousel__footer > span:last-child { justify-self: end; }
