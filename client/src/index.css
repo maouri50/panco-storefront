@@ -564,6 +564,11 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
 .admin-form input, .admin-form textarea { width: 100%; min-width: 0; padding: 11px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); outline: 0; font-family: "Playfair Display", Georgia, serif; font-size: 18px; line-height: 1.16; }
 .admin-form textarea { min-height: 84px; resize: vertical; }
 .admin-span-two { grid-column: span 2; }
+.admin-image-field { display: grid; gap: 8px; }
+.admin-image-field__controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 14px; }
+.admin-upload-button { margin-top: 0; cursor: pointer; white-space: nowrap; }
+.admin-upload-input { display: none !important; }
+.admin-image-preview { width: 88px; height: 88px; margin-top: 4px; border: 1px solid var(--line); object-fit: cover; background: var(--sand); }
 .admin-toggle { align-content: end; }
 .admin-toggle span { display: flex; align-items: center; gap: 8px; min-height: 39px; font-family: "Playfair Display", Georgia, serif; font-size: 17px; text-transform: none; letter-spacing: 0; }
 .admin-toggle input { width: 16px; height: 16px; accent-color: var(--night); }
@@ -591,6 +596,9 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
   .admin-editor { padding: 31px 20px; }
   .admin-form__grid { grid-template-columns: 1fr; }
   .admin-span-two { grid-column: auto; }
+  .admin-image-field { grid-column: auto; }
+  .admin-image-field__controls { grid-template-columns: 1fr; align-items: stretch; }
+  .admin-upload-button { width: max-content; }
   .admin-form__foot { align-items: flex-start; flex-direction: column; }
 }
 

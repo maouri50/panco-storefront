@@ -9,6 +9,7 @@ import { listNewsletterSubscribers, subscribeToNewsletter, unsubscribeNewsletter
 import { newsletterEmailInput, newsletterSubscribeInput } from "./newsletterValidation";
 import { sendOrderNotifications } from "./orderNotifications";
 import { createCashOnDeliveryReference } from "./orderReference";
+import { storagePut } from "./storage";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 
 const catalogInput = z.object({
@@ -23,6 +24,12 @@ const catalogInput = z.object({
 const announcementInput = z.object({
   enabled: z.boolean(), messages: z.array(z.string().trim().min(1).max(120)).min(1).max(12), backgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   textColor: z.string().regex(/^#[0-9a-fA-F]{6}$/), fontStyle: z.enum(["mono", "serif", "sans"]), rotationSeconds: z.number().int().min(2).max(20),
+});
+
+const catalogImageUploadInput = z.object({
+  fileName: z.string().trim().min(1).max(160),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp", "image/avif"]),
+  data: z.string().min(1).max(3_600_000),
 });
 
 export const appRouter = router({
@@ -71,6 +78,19 @@ export const appRouter = router({
   announcements: router({ publicConfig: publicProcedure.query(() => getAnnouncementConfig()), update: adminProcedure.input(announcementInput).mutation(({ input }) => saveAnnouncementConfig(input)) }),
   catalog: router({
     publicList: publicProcedure.query(() => listCatalogItems(true)), adminList: adminProcedure.query(() => listCatalogItems(false)),
+    uploadImage: adminProcedure.input(catalogImageUploadInput).mutation(async ({ input }) => {
+      const match = input.data.match(/^data:(image\/(?:jpeg|png|webp|avif));base64,(.+)$/);
+      if (!match || match[1] !== input.contentType) throw new TRPCError({ code: "BAD_REQUEST", message: "Choose a valid JPEG, PNG, WebP, or AVIF image." });
+      const buffer = Buffer.from(match[2], "base64");
+      if (!buffer.length || buffer.length > 2_500_000) throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: "Images must be 2.5 MB or smaller." });
+      const safeName = input.fileName.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "product-image";
+      try {
+        return await storagePut(`panco/catalog/${safeName}`, buffer, input.contentType);
+      } catch (error) {
+        console.error("[Panco catalog image upload]", error);
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Image storage is not available yet. You can still paste a public image URL." });
+      }
+    }),
     create: adminProcedure.input(catalogInput).mutation(({ input }) => createCatalogItem(input)), update: adminProcedure.input(z.object({ id: z.number().int().positive(), item: catalogInput })).mutation(({ input }) => updateCatalogItem(input.id, input.item)),
     remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => deleteCatalogItem(input.id)), importCurrentCatalog: adminProcedure.mutation(() => seedCatalogItems(initialCatalogItems)),
   }),
