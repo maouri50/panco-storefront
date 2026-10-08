@@ -273,7 +273,6 @@ export default function Home() {
                   <Link href={`/products/${product.slug}`} className="catalog-card__link"><img src={product.image} alt={product.name} /></Link>
                   <span className="catalog-number">{String(index + 1).padStart(2, "0")}</span>
                   {(product.was || product.tag) && <span className="catalog-tag">{product.was ? "SALE" : product.tag}</span>}
-                  <button type="button" onClick={() => addToCart(product)} className="card-add">{copy.quickAdd} <Plus size={14} /></button>
                 </div>
                 <div className="catalog-card__meta">
                   <div>
@@ -319,7 +318,7 @@ export default function Home() {
 
         <section className="small-things-section page-section">
           <div className="small-things-copy"><p className="kicker">{isArabic ? "أشياء صغيرة جميلة" : isFrench ? "Les petites belles choses" : "Small good things"}</p><h2>{isArabic ? <>تفاصيل تستحق<br /><em>أن تبقى قريبة.</em></> : isFrench ? <>Des détails à<br /><em>garder près de soi.</em></> : <>Details worth<br /><em>keeping close.</em></>}</h2><a href="#shop" className="underlined-link">{isArabic ? "اكتشف القطع الصغيرة" : isFrench ? "Découvrir la petite maroquinerie" : "Discover small goods"} <ArrowRight size={15} /></a></div>
-          <div className="small-things-product"><Link href={`/products/${localizedProducts[0].slug}`}><img src={localizedProducts[0].image} alt={localizedProducts[0].name} /></Link><div><span>{isArabic ? "جديد / 04" : "New / 04"}</span><h3><Link href={`/products/${localizedProducts[0].slug}`}>{localizedProducts[0].name}</Link></h3><p>{localizedProducts[0].description}</p><button type="button" onClick={() => addToCart(localizedProducts[0])}>{copy.quickAdd} <Plus size={14} /></button></div></div>
+          <div className="small-things-product"><Link href={`/products/${localizedProducts[0].slug}`}><img src={localizedProducts[0].image} alt={localizedProducts[0].name} /></Link><div><span>{isArabic ? "جديد / 04" : "New / 04"}</span><h3><Link href={`/products/${localizedProducts[0].slug}`}>{localizedProducts[0].name}</Link></h3><p>{localizedProducts[0].description}</p></div></div>
         </section>
 
         <section id="journal" className="journal-section">
