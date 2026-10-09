@@ -177,21 +177,36 @@ export async function sendOrderNotifications(
   }
 
   if (config.telegramBotToken && config.telegramChatId) {
+    const caption = telegramOrderCaption(order);
     const telegramResponse = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendPhoto`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: config.telegramChatId,
         photo: order.productImageUrl,
-        caption: telegramOrderCaption(order),
+        caption,
       }),
     });
     const telegramPayload = await telegramResponse.json().catch(() => null) as { ok?: boolean } | null;
 
     if (!telegramResponse.ok || !telegramPayload?.ok) {
-      throw new Error("The order email was sent, but the Telegram alert could not be sent. Please check the Panco Telegram bot token and owner chat ID.");
+      // Telegram may reject a remote product image even though the order itself,
+      // email, and bot configuration are valid. Keep the order successful and
+      // deliver the same structured details as a text alert instead.
+      const fallbackResponse = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: config.telegramChatId, text: caption }),
+      });
+      const fallbackPayload = await fallbackResponse.json().catch(() => null) as { ok?: boolean } | null;
+      if (!fallbackResponse.ok || !fallbackPayload?.ok) {
+        console.error("[Panco Telegram order alert] Both photo and text delivery failed.");
+      } else {
+        telegram = "sent";
+      }
+    } else {
+      telegram = "sent";
     }
-    telegram = "sent";
   }
 
   return { email, whatsapp, telegram };

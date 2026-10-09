@@ -122,4 +122,29 @@ describe("sendOrderNotifications", () => {
     });
     expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string).caption).toContain("Order total: $78");
   });
+
+  it("falls back to a Telegram text alert when a new product image cannot be fetched", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: false }), { status: 400 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, result: { message_id: 102 } }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await sendOrderNotifications({ ...order, productImageUrl: "https://images.example.invalid/new-product.jpg" }, {
+      ...emailOnlyConfig,
+      resendApiKey: "",
+      notificationEmail: "",
+      telegramBotToken: "123456:telegram-test-token",
+      telegramChatId: "123456789",
+    });
+
+    expect(result).toEqual({ email: "not_configured", whatsapp: "not_configured", telegram: "sent" });
+    expect(fetchMock.mock.calls.map(call => call[0])).toEqual([
+      "https://api.telegram.org/bot123456:telegram-test-token/sendPhoto",
+      "https://api.telegram.org/bot123456:telegram-test-token/sendMessage",
+    ]);
+    expect(JSON.parse(fetchMock.mock.calls[1]?.[1]?.body as string)).toMatchObject({
+      chat_id: "123456789",
+      text: expect.stringContaining("New Cash on Delivery order — PA-TEST-01"),
+    });
+  });
 });
