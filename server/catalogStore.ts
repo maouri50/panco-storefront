@@ -29,23 +29,45 @@ const parseArray = <T>(value: string, fallback: T[]): T[] => {
   }
 };
 
-export const mapCatalogItem = (item: CatalogItem): CatalogInput & { id: number } => ({
-  id: item.id,
-  slug: item.slug,
-  name: item.name,
-  category: item.category,
-  price: item.price,
-  was: item.was ?? undefined,
-  image: item.image,
-  gallery: parseArray<string>(item.galleryJson, [item.image]),
-  swatches: parseArray<string>(item.swatchesJson, []),
-  colors: parseArray<CatalogColor>(item.colorsJson, []),
-  tag: item.tag ?? undefined,
-  description: item.description,
-  highlights: parseArray<string>(item.highlightsJson, []),
-  published: item.published,
-  displayOrder: item.displayOrder,
-});
+const isUsableImageReference = (value: unknown): value is string => {
+  if (typeof value !== "string" || !value.trim()) return false;
+  if (value.startsWith("/") && !value.startsWith("//")) return true;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+export const mapCatalogItem = (item: CatalogItem): CatalogInput & { id: number } => {
+  const image = isUsableImageReference(item.image) ? item.image : "/panco-media/north-atelier-cardholder_12ba7095.jpg";
+  const gallery = parseArray<string>(item.galleryJson, [image]).filter(isUsableImageReference);
+  const safeGallery = gallery.length ? gallery : [image];
+  const swatches = parseArray<string>(item.swatchesJson, []);
+  const rawColors = parseArray<CatalogColor>(item.colorsJson, []).map(color => ({
+    ...color,
+    image: isUsableImageReference(color?.image) ? color.image : image,
+  }));
+  const colors = rawColors.length ? rawColors : [{ name: "Studio selection", color: swatches[0] || "#805238", image }];
+  return {
+    id: item.id,
+    slug: item.slug,
+    name: item.name,
+    category: item.category,
+    price: item.price,
+    was: item.was ?? undefined,
+    image,
+    gallery: safeGallery,
+    swatches,
+    colors,
+    tag: item.tag ?? undefined,
+    description: item.description,
+    highlights: parseArray<string>(item.highlightsJson, []),
+    published: item.published,
+    displayOrder: item.displayOrder,
+  };
+};
 
 const toValues = (item: CatalogInput): InsertCatalogItem => ({
   slug: item.slug,

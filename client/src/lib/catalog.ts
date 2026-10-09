@@ -14,17 +14,46 @@ export type Product = {
   highlights: string[];
 };
 
+export const isUsableProductImage = (path: unknown): path is string => {
+  if (typeof path !== "string" || !path.trim()) return false;
+  if (path.startsWith("/panco-media/") || path.startsWith("/manus-storage/")) return true;
+  try {
+    const parsed = new URL(path);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
 export const pancoAssetUrl = (path: string) => {
   if (path.startsWith("/panco-media/")) return path;
+  if (path.startsWith("/manus-storage/panco/catalog/")) return path;
   const legacyStoragePath = "/" + ["manus", "storage"].join("-") + "/";
   if (path.startsWith(legacyStoragePath)) return path.replace(legacyStoragePath, "/panco-media/");
   try {
     const parsed = new URL(path);
+    if (parsed.pathname.startsWith("/manus-storage/panco/catalog/")) return path;
     if (parsed.pathname.startsWith(legacyStoragePath)) return parsed.pathname.replace(legacyStoragePath, "/panco-media/");
   } catch {
     // Keep non-URL catalog values unchanged.
   }
   return path;
+};
+
+export const normalizeProductMedia = (product: Product): Product => {
+  const image = isUsableProductImage(product.image) ? pancoAssetUrl(product.image) : "";
+  const gallery = product.gallery.map(pancoAssetUrl).filter(isUsableProductImage);
+  const fallback = image || gallery[0] || "/panco-media/north-atelier-cardholder_12ba7095.jpg";
+  const safeGallery = gallery.length ? gallery : [fallback];
+  const colors = product.colors.length
+    ? product.colors.map(color => ({ ...color, image: isUsableProductImage(color.image) ? pancoAssetUrl(color.image) : fallback }))
+    : [{ name: "Studio selection", color: product.swatches[0] || "#805238", image: fallback }];
+  return {
+    ...product,
+    image: fallback,
+    gallery: safeGallery,
+    colors,
+  };
 };
 
 const rawCatalogProducts: Product[] = [
@@ -110,12 +139,7 @@ const rawCatalogProducts: Product[] = [
   },
 ];
 
-export const catalogProducts: Product[] = rawCatalogProducts.map(product => ({
-  ...product,
-  image: pancoAssetUrl(product.image),
-  gallery: product.gallery.map(pancoAssetUrl),
-  colors: product.colors.map(color => ({ ...color, image: pancoAssetUrl(color.image) })),
-}));
+export const catalogProducts: Product[] = rawCatalogProducts.map(normalizeProductMedia);
 
 export function getProduct(slug: string) {
   return catalogProducts.find((product) => product.slug === slug);
