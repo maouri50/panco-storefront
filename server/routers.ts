@@ -9,7 +9,7 @@ import { listNewsletterSubscribers, subscribeToNewsletter, unsubscribeNewsletter
 import { newsletterEmailInput, newsletterSubscribeInput } from "./newsletterValidation";
 import { sendOrderNotifications } from "./orderNotifications";
 import { createCashOnDeliveryReference } from "./orderReference";
-import { storagePut } from "./storage";
+import { uploadCatalogImage } from "./imageStorage";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 
 const catalogInput = z.object({
@@ -85,7 +85,7 @@ export const appRouter = router({
       if (!buffer.length || buffer.length > 2_500_000) throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: "Images must be 2.5 MB or smaller." });
       const safeName = input.fileName.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "product-image";
       try {
-        return await storagePut(`panco/catalog/${safeName}`, buffer, input.contentType);
+        return await uploadCatalogImage(`panco/catalog/${safeName}`, buffer, input.contentType);
       } catch (error) {
         console.error("[Panco catalog image upload]", error);
         throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Image storage is not available yet. You can still paste a public image URL." });
