@@ -3,7 +3,7 @@
  * a reference-inspired retail rhythm built from shell paper, inset blue, ember accents,
  * centered house mark, oversized campaign imagery, and crisp mono retail annotations.
  */
-import { type CSSProperties, useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -105,6 +105,7 @@ export default function Home() {
   const { locale, direction, setLocale } = useLocale();
   const copy = homeCopy[locale];
   const localizedProducts = products.map((product) => localizeProduct(product, locale));
+  const productRailKey = localizedProducts.map((product) => product.slug).join("|");
   const isArabic = locale === "ar";
   const isFrench = locale === "fr";
   const heroCtaLabel = isArabic ? "تسوّق التشكيلة" : isFrench ? "Voir la collection" : "Shop Collection";
@@ -127,6 +128,7 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [scrolled, setScrolled] = useState(false);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const productRailRef = useRef<HTMLDivElement>(null);
   const announcementQuery = trpc.announcements.publicConfig.useQuery(undefined, { retry: false });
   const announcement = announcementQuery.data;
   const submitCashOnDelivery = trpc.orders.submitCashOnDelivery.useMutation({
@@ -161,6 +163,10 @@ export default function Home() {
     }, announcement.rotationSeconds * 1000);
     return () => window.clearInterval(interval);
   }, [announcement]);
+
+  useEffect(() => {
+    productRailRef.current?.scrollTo({ left: 0, behavior: "auto" });
+  }, [productRailKey]);
 
   const addToCart = (product: Product) => {
     setCartItem(product);
@@ -266,7 +272,7 @@ export default function Home() {
             </div>
             <a href="#collections" className="underlined-link">{copy.collections} <ArrowRight size={15} /></a>
           </div>
-          <div className="product-rail">
+          <div className="product-rail" ref={productRailRef}>
             {localizedProducts.map((product, index) => (
               <article className="catalog-card" key={product.name}>
                 <div className="catalog-card__image">

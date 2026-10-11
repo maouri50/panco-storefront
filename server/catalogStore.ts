@@ -91,7 +91,7 @@ export async function listCatalogItems(publicOnly = false) {
   if (!db) return [];
   try {
     const rows = publicOnly
-      ? await db.select().from(catalogItems).where(eq(catalogItems.published, true)).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt))
+      ? await db.select().from(catalogItems).where(eq(catalogItems.published, true)).orderBy(desc(catalogItems.createdAt), asc(catalogItems.displayOrder))
       : await db.select().from(catalogItems).orderBy(asc(catalogItems.displayOrder), desc(catalogItems.createdAt));
     return rows.map(mapCatalogItem);
   } catch (error) {
