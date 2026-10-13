@@ -906,8 +906,8 @@ html[dir="rtl"] .review-contact svg { transform: scaleX(-1); }
   .purchase-controls { grid-template-columns: 98px 1fr; }
   .inline-order-card { margin-top: 16px; padding: 24px 17px 19px; border-radius: 23px; }
   .inline-order-card h2 { font-size: 40px; }
-  .direct-order-fields { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
-  .direct-order-fields .full-row { grid-column: span 2; }
+  .direct-order-fields { grid-template-columns: 1fr; gap: 16px; }
+  .direct-order-fields .full-row { grid-column: auto; }
   .direct-order-fields label { font-size: 7px; }
   .direct-order-fields input { font-size: 16px; }
   .cod-card { margin-top: 17px; }

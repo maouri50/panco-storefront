@@ -1,5 +1,5 @@
 @media (max-width: 680px) {
-  .variant-field > div { grid-template-columns: repeat(3, 1fr); }
+  .variant-field > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .variant-field button { grid-template-rows: 72px auto; min-height: 105px; }
   .variant-field button img { height: 72px; }
   .inline-order-card { margin-top: 16px; padding: 25px 18px 20px; border-radius: 23px; }
